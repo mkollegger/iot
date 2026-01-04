@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/Common/" />
+  <Folder Name="/Nuget/">
+    <Project Path="Nuget/Mks.Iot.I2c/Mks.Iot.I2c.csproj" />
+  </Folder>
+  <Folder Name="/Nuget/Mks.Iot.Ftdi/">
+    <Project Path="Nuget/Mks.Iot.Ftdi/Mks.Iot.Ftdi.Ft260/Mks.Iot.Ftdi.Ft260.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/I2cTests/I2cTests.csproj" />
+  </Folder>
+  <Folder Name="/_Solution Items/">
+    <File Path="../.editorconfig" />
+    <File Path="../.filenesting.json" />
+    <File Path="../.gitignore" />
+    <File Path="../build/azure-pipelines.yml" />
+    <File Path="../Changelog.md" />
+    <File Path="../README.md" />
+  </Folder>
+</Solution>
