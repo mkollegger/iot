@@ -1,64 +1,66 @@
-# Beispiele / Samples
+# Samples
 
-Dieser Ordner enthält Beispielprojekte, die verschiedene Aspekte der IoT-Entwicklung mit .NET demonstrieren. Die Beispiele sind plattformübergreifend konzipiert und funktionieren auf unterschiedlichsten Geräteklassen und Betriebssystemen.
+*This document is also available in other languages: [Deutsch](readme-de.md)*
 
-## Übersicht
+This folder contains sample projects demonstrating various aspects of IoT development with .NET. The samples are designed to be cross-platform and work on different device classes and operating systems.
 
-Die Beispiele zeigen praktische Implementierungen für verschiedene Hardware-Plattformen:
+## Overview
 
-**Unterstützte Geräte:**
-- **IoT-Geräte**: Raspberry Pi, Arduino, ESP32 und andere Embedded-Systeme
+The samples showcase practical implementations for various hardware platforms:
+
+**Supported Devices:**
+- **IoT Devices**: Raspberry Pi, Arduino, ESP32 and other embedded systems
 - **Desktop**: Windows, macOS, Linux PCs
-- **Mobile**: Tablets und Smartphones (Android, iOS)
-- **Cloud & Edge**: Container und Cloud-Infrastruktur
+- **Mobile**: Tablets and smartphones (Android, iOS)
+- **Cloud & Edge**: Containers and cloud infrastructure
 
 **Cross-Platform Features:**
-- GPIO-Steuerung und Hardware-Interaktion auf verschiedenen Plattformen
-- Plattformübergreifendes Deployment und Remote-Debugging
-- Best Practices für .NET auf Windows, Linux, macOS und Embedded-Systemen
-- Einheitliche Entwicklungserfahrung über alle Geräteklassen hinweg
+- GPIO control and hardware interaction across different platforms
+- Cross-platform deployment and remote debugging
+- Best practices for .NET on Windows, Linux, macOS and embedded systems
+- Unified development experience across all device classes
 
-## Verfügbare Beispiele
+## Available Samples
 
 ### [HelloPi](hellopi/)
 
-Ein einfaches Einsteiger-Beispiel, das die Grundlagen der Raspberry Pi Entwicklung mit .NET 10 demonstriert.
+A simple starter example demonstrating the basics of Raspberry Pi development with .NET 10.
 
 **Features:**
-- Steuerung von 2 LEDs über GPIO
-- Beispiel für Visual Studio Code und Visual Studio 2026
-- Remote Deployment und Debugging
-- Einfache Projektstruktur für erste Schritte
+- Control of 2 LEDs via GPIO
+- Example for Visual Studio Code and Visual Studio 2026
+- Remote deployment and debugging
+- Simple project structure for getting started
 
-**Technologien:**
+**Technologies:**
 - .NET 10
-- GPIO-Zugriff
-- Cross-Platform Deployment
+- GPIO access
+- Cross-platform deployment
 
-[→ Zur HelloPi Dokumentation](hellopi/README.md)
+[→ Go to HelloPi documentation](hellopi/README.md)
 
 ---
 
-## Weitere Beispiele
+## More Samples
 
-Weitere Beispiele werden in Zukunft hinzugefügt. Vorschläge für neue Beispiele sind willkommen!
+Additional samples will be added in the future. Suggestions for new samples are welcome!
 
-## Voraussetzungen
+## Prerequisites
 
-Allgemeine Voraussetzungen variieren je nach Zielplattform:
+General requirements vary depending on the target platform:
 
-**Für IoT-Geräte (Raspberry Pi, etc.):**
-- IoT-Hardware (z.B. Raspberry Pi 4 oder neuer)
-- .NET 10 SDK installiert
-- GPIO-Zugriff und entsprechende Peripherie
+**For IoT Devices (Raspberry Pi, etc.):**
+- IoT hardware (e.g., Raspberry Pi 4 or newer)
+- .NET 10 SDK installed
+- GPIO access and corresponding peripherals
 
-**Für Desktop & Mobile:**
-- Windows, macOS oder Linux
+**For Desktop & Mobile:**
+- Windows, macOS or Linux
 - .NET 10 SDK
-- Visual Studio Code oder Visual Studio 2026
+- Visual Studio Code or Visual Studio 2026
 
-**Allgemein:**
-- Grundkenntnisse in C# und .NET
-- Git für Versionskontrolle
+**General:**
+- Basic knowledge of C# and .NET
+- Git for version control
 
-Detaillierte Installationsanleitungen finden Sie in der [Hauptdokumentation](../wiki/).
+For detailed installation guides, please visit the [main documentation](../wiki/).
