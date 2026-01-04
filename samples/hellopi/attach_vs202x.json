@@ -1,7 +1,5 @@
+//  DebugAdapterHost.Launch /LaunchJson:attach_vs202x.json
 {
-  //DebugAdapterHost.Launch /LaunchJson:C:\tmp\launch.json
-  //DebugAdapterHost.Launch /LaunchJson:D:\Code\GitHub\mkollegger\iot\samples\hellopi\attach_vs202x.json
-
   "version": "0.2.0",
   "adapter": "C:\\Windows\\System32\\OpenSSH\\ssh.exe",
   "adapterArgs": "mike@192.168.178.69 -T sudo /home/mike/.vs-debugger/vs2022/vsdbg --interpreter=vscode",
@@ -21,7 +19,7 @@
       "type": "coreclr",
       "cwd": "/home/mike/shared/debug/hellopi/bin/Debug/net10.0/linux-arm64/",
       "program": "/home/mike/.dotnet/dotnet",
-      "args": [ "/home/mike/shared/debug/hellopi/bin/Debug/net10.0/linux-arm64/hellopi.dll","--debug" ],
+      "args": [ "/home/mike/shared/debug/hellopi/bin/Debug/net10.0/linux-arm64/hellopi.dll", "--debug" ],
       "request": "launch",
       "console": "internalTerminal"
     }
