@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
+            "name": ".NET Core Launch (PI@192.168.178.69)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
