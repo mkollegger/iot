@@ -287,8 +287,9 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
-# BISS
+# mkollegger
 *Biss*.xml
 devinfos.json
 appsettings_biss.json
 remote_*.json
+wiki/
