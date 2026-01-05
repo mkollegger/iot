@@ -1,55 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<!-- #region Framework-->
 		<TargetFramework>net9.0</TargetFramework>
-		<!-- #endregion Framework-->
-		<!-- #region Biss-->
-		<RepositoryType>GIT</RepositoryType>
-		<ImplicitUsings>disable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<EnableNETAnalyzers>true</EnableNETAnalyzers>
-		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
-		<EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
-		<RunAnalyzers>true</RunAnalyzers>
-		<RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
-		<RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
-		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-		<DebugType>portable</DebugType>
-		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-		<DebugSymbols>true</DebugSymbols>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<!-- #endregion Biss-->
-		<!-- #region Solution-->
-		<Product>Biss.Sdk</Product>
-		<Description>Biss Core SDK</Description>
-		<Company>FOTEC Forschungs- und Technologietransfer GmbH</Company>
-		<Copyright>(C) 2009-2024 FOTEC Forschungs- und Technologietransfer GmbH</Copyright>
-		<Authors>BISS</Authors>
-		<PackageProjectUrl>https://dev.azure.com/fotec/BISS-SDK</PackageProjectUrl>
-		<PackageTags>BISS SDK</PackageTags>
-		<Version>1.0.0</Version>
-		<RepositoryUrl>https://dev.azure.com/fotec/BISS-SDK/_git/BISS-SDK-Core</RepositoryUrl>
-		<!-- #endregion Solution-->
-		<!-- #region Project-->
-		<PackageIcon>nugetImage.png</PackageIcon>
-		<PackageReadmeFile>readme.md</PackageReadmeFile>
-		<PackageReleaseNotes>changelog.md</PackageReleaseNotes>
-		<NeutralLanguage>en</NeutralLanguage>
-		<SignAssembly>true</SignAssembly>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<PackageCopyToOutput>true</PackageCopyToOutput>
-		<!-- #endregion Project-->
 	</PropertyGroup>
-	<!-- #region Pipeline Build-->
-	<PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
-		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-	</PropertyGroup>
-	<!-- #endregion Pipeline Build-->
-	<!-- #region Project References-->
-	<!-- #endregion Project References-->
-	<!-- #region NuGet References-->
+
+	<!-- #region SDK Setting-->
+	<Import Project="..\..\mks.iot.projectinfos.proj" />
+	<!-- #endregion SDK Setting-->
+
+
 	<ItemGroup>
 		<PackageReference Include="Iot.Device.Bindings" Version="4.0.1" />
 		<PackageReference Include="Iot.Device.Bindings.SkiaSharpAdapter" Version="4.0.1" />
@@ -58,7 +16,6 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
-	<!-- #endregion NuGet References-->
 	<ItemGroup>
 		<None Include="readme.md">
 			<Pack>True</Pack>
