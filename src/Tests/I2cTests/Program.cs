@@ -31,11 +31,11 @@ using System.Device.I2c;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO.Ports;
-using Biss.Extensions;
-using Biss.Log.Producer;
 using Iot.Device.Graphics;
 using Iot.Device.Graphics.SkiaSharpAdapter;
 using Iot.Device.Ssd13xx.Commands.Ssd1306Commands;
+using Microsoft.Extensions.Logging;
+using Mks.Common.Ext;
 using Mks.Iot.Ftdi.Ft260;
 using Mks.Iot.I2c.Devices;
 using SkiaSharp;
@@ -61,6 +61,7 @@ namespace I2cTests
 
         #endregion
 
+        private static ILogger? _log;
 
         //https://github.com/dotnet/iot/blob/main/src/devices/Ssd13xx/samples/i2c/Ssd13xx.Samples
         private static async Task Main(string[] args)
@@ -142,7 +143,7 @@ namespace I2cTests
                 }
 
                 sw.Stop();
-                Logging.Log.LogInfo($"Refrash rate: {sw.ElapsedMilliseconds} ms");
+                _log.TryLogInfo($"Refrash rate: {sw.ElapsedMilliseconds} ms");
             } while (true);
 
 
@@ -298,10 +299,10 @@ namespace I2cTests
 
                     //x.DrawText(DateTime.Now.ToString("HH:mm:ss"),0,0,paint);
                     string text = DateTime.Now.ToString("HH:mm:ss") + "\nHallo Welt!";
-                    Logging.Log.LogInfo($"({nameof(DisplayClock)}): {text}");
+                    _log.TryLogInfo($"({nameof(DisplayClock)}): {text}");
                     g.DrawText(text, font, fontSize, Color.White, new Point(0, y));
                     ssd1306.DrawBitmap(image);
-                    Logging.Log.LogInfo($"({nameof(DisplayClock)}): Done!");
+                    _log.TryLogInfo($"({nameof(DisplayClock)}): Done!");
 
                     //y++;
                     //if (y >= image.Height)

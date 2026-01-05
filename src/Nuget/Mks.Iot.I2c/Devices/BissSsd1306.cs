@@ -31,12 +31,12 @@ using System.Device.I2c;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
-using Biss.Extensions;
-using Biss.Log.Producer;
 using Iot.Device.Graphics;
 using Iot.Device.Graphics.SkiaSharpAdapter;
 using Iot.Device.Ssd13xx;
 using Iot.Device.Ssd13xx.Commands.Ssd1306Commands;
+using Microsoft.Extensions.Logging;
+using Mks.Common.Ext;
 using SkiaSharp;
 
 namespace Mks.Iot.I2c.Devices;
@@ -79,7 +79,7 @@ public class BissSsd1306 : Ssd1306
     private int _maxCharPerLine;
     private SKFont _skFont;
     private SKPaint _skPaint;
-
+    private ILogger? _log;
 
     /// <summary>
     ///     Ssd1306 - BISS Impementierung
@@ -182,7 +182,7 @@ public class BissSsd1306 : Ssd1306
 
             if (text.Length > _maxCharPerLine)
             {
-                Logging.Log.TryLogWarning($"[{GetType().Name}]({nameof(WriteText)}): Text is too long for the display. Truncating to {_maxCharPerLine} characters.");
+                _log.TryLogWarning($"[{GetType().Name}]({nameof(WriteText)}): Text is too long for the display. Truncating to {_maxCharPerLine} characters.");
                 text = text.Substring(0, _maxCharPerLine);
             }
 
@@ -282,7 +282,7 @@ public class BissSsd1306 : Ssd1306
         }
 
         sw.Stop();
-        Logging.Log.TryLogTrace($"[{GetType().Name}]({nameof(ClearScreen)}): ClearScreen took {sw.ElapsedMilliseconds} ms");
+        _log.TryLogTrace($"[{GetType().Name}]({nameof(ClearScreen)}): ClearScreen took {sw.ElapsedMilliseconds} ms");
     }
 
     /// <inheritdoc />

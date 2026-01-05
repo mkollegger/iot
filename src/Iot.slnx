@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Common/" />
   <Folder Name="/Nuget/">
+    <Project Path="Nuget/Mks.Common/Mks.Common.csproj" Id="719ebeaf-e647-4c3f-ac6c-e4eaea0c61ec" />
     <Project Path="Nuget/Mks.Iot.I2c/Mks.Iot.I2c.csproj" />
   </Folder>
   <Folder Name="/Nuget/Mks.Iot.Ftdi/">

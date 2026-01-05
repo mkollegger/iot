@@ -31,7 +31,6 @@ using System.Collections.Generic;
 using System.Device.I2c;
 using System.Threading;
 using System.Threading.Tasks;
-using Biss.Log.Producer;
 using Iot.Device.Pcx857x;
 using Iot.Device.Ssd13xx;
 using Iot.Device.Ssd13xx.Commands;
@@ -238,7 +237,6 @@ internal class BasicFont
         }
         catch (Exception e)
         {
-            Logging.Log.LogError($"{character} {e}");
             return new byte[] {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
         }
     }

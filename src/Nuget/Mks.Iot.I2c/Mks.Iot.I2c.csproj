@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<!-- #region Framework-->
 		<TargetFramework>net9.0</TargetFramework>
@@ -51,7 +51,6 @@
 	<!-- #endregion Project References-->
 	<!-- #region NuGet References-->
 	<ItemGroup>
-		<PackageReference Include="Biss" Version="10.2.5" />
 		<PackageReference Include="Iot.Device.Bindings" Version="4.0.1" />
 		<PackageReference Include="Iot.Device.Bindings.SkiaSharpAdapter" Version="4.0.1" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
@@ -71,6 +70,7 @@
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
+		<ProjectReference Include="..\Mks.Common\Mks.Common.csproj" />
 		<None Update="Mks.Iot.I2c.targets">
 			<PackagePath>build\</PackagePath>
 			<Pack>true</Pack>

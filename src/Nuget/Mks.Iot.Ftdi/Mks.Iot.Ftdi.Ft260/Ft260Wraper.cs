@@ -36,9 +36,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using Biss.Extensions;
-using Biss.Log.Producer;
 using Microsoft.Extensions.Logging;
+using Mks.Common.Ext;
 
 // ReSharper disable InconsistentNaming
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -286,11 +285,15 @@ namespace Mks.Iot.Ftdi.Ft260
         private bool _disposedValue;
         private IntPtr _ft260Handle = IntPtr.Zero;
 
+        private readonly ILogger? _log;
+
         /// <summary>
         ///     Wraper für die LibFT260 von FTDI
         /// </summary>
-        public Ft260Wraper()
+        public Ft260Wraper(ILogger? logger = null)
         {
+            _log = logger;
+
             FileInfo fi = new FileInfo(Assembly.GetEntryAssembly()!.Location);
             FileInfo nativeDll = new FileInfo(Path.Combine(fi.DirectoryName!, "LibFT260.dll"));
             if (!nativeDll.Exists)
@@ -313,17 +316,17 @@ namespace Mks.Iot.Ftdi.Ft260
                 string? test = Assembly.GetExecutingAssembly().FullName;
 
                 using FileStream fileStream = File.Create(nativeDll.FullName);
-                bool r = Assembly.GetExecutingAssembly().GetManifestStoreToFile($"Biss.Iot.Ftdi.Ft260.Lib.{folder}.LibFT260.dll", fileStream);
+                bool r = Assembly.GetExecutingAssembly().GetManifestStoreToFile($"Biss.Iot.Ftdi.Ft260.Lib.{folder}.LibFT260.dll", fileStream,_log);
                 if (!r)
                 {
-                    Logging.Log.LogError($"[{nameof(Ft260Wraper)}]({nameof(Ft260Wraper)}): Can not store native dll!");
+                    _log.TryLogError($"[{nameof(Ft260Wraper)}]({nameof(Ft260Wraper)}): Can not store native dll!");
                 }
             }
 
             Open();
 
-            Logging.Log.LogInfo($"[{nameof(Ft260Wraper)}]({nameof(Ft260Wraper)}): Nativ Lib version: {GetLibVersion()}");
-            Logging.Log.LogInfo($"[{nameof(Ft260Wraper)}]({nameof(Ft260Wraper)}): Chip version: {GetChipVersion()}");
+            _log.TryLogInfo($"[{nameof(Ft260Wraper)}]({nameof(Ft260Wraper)}): Nativ Lib version: {GetLibVersion()}");
+            _log.TryLogInfo($"[{nameof(Ft260Wraper)}]({nameof(Ft260Wraper)}): Chip version: {GetChipVersion()}");
         }
 
 
@@ -352,7 +355,7 @@ namespace Mks.Iot.Ftdi.Ft260
                     s += "0x" + b.ToString("X2", CultureInfo.CurrentCulture) + " ";
                 }
 
-                Logging.Log.LogTrace($"[{nameof(Ft260Wraper)}]({nameof(GetI2cSlaves)}): {r.Count} slave(s) at {s}");
+                _log.TryLogTrace($"[{nameof(Ft260Wraper)}]({nameof(GetI2cSlaves)}): {r.Count} slave(s) at {s}");
             }
 
             return r;
@@ -383,7 +386,7 @@ namespace Mks.Iot.Ftdi.Ft260
 
             if (!noDebugLog)
             {
-                Logging.Log.LogError($"[{nameof(Ft260Wraper)}]({nameof(CheckResult)}): Error result - {result}");
+                _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(CheckResult)}): Error result - {result}");
             }
 
             return false;
@@ -451,7 +454,7 @@ namespace Mks.Iot.Ftdi.Ft260
             bool r = CheckResult(FT260_OpenByVidPid(_ft260VID, _ft260PID, _ft260I2C_DEVICE, out _ft260Handle));
             if (r)
             {
-                Logging.Log.LogInfo($"[{nameof(Ft260Wraper)}]({nameof(Open)}): Chip Version {GetChipVersion()}");
+                _log.TryLogInfo($"[{nameof(Ft260Wraper)}]({nameof(Open)}): Chip Version {GetChipVersion()}");
             }
 
             return r;
@@ -694,38 +697,38 @@ namespace Mks.Iot.Ftdi.Ft260
                 {
                     if (s.HasFlag(Ft260I2cControllerStatus.Busy))
                     {
-                        Logging.Log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Controller busy");
+                        _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Controller busy");
                     }
                     else
                     {
                         if (s.HasFlag(Ft260I2cControllerStatus.Error))
                         {
-                            Logging.Log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Error condition");
+                            _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Error condition");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.AddressNack))
                         {
-                            Logging.Log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Slave address was not acknowledged during last operation");
+                            _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Slave address was not acknowledged during last operation");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.DataNack))
                         {
-                            Logging.Log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Data not acknowledged during last operation");
+                            _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Data not acknowledged during last operation");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.ArbitrationLost))
                         {
-                            Logging.Log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Arbitration lost during last operation");
+                            _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Arbitration lost during last operation");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.Idle))
                         {
-                            //Logging.Log.LogTrace($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Controller idle");
+                            //_log.TryLogTrace($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Controller idle");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.BusBusy))
                         {
-                            Logging.Log.LogWarning($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Bus busy");
+                            _log.LogWarning($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Bus busy");
                         }
                     }
                 }

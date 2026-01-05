@@ -52,7 +52,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Biss" Version="10.2.5" />
 		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -76,6 +75,9 @@
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Mks.Common\Mks.Common.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="Lib\FTD2XX_NET.dll">
