@@ -1,21 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
 	<!-- #region SDK Setting-->
 	<Import Project="..\..\mks.iot.projectinfos.proj" />
 	<!-- #endregion SDK Setting-->
 
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 
-  </ItemGroup>
+	</ItemGroup>
 
 </Project>

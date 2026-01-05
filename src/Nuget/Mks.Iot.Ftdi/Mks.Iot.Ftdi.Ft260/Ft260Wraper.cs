@@ -296,7 +296,7 @@ namespace Mks.Iot.Ftdi.Ft260
 
             FileInfo fi = new FileInfo(Assembly.GetEntryAssembly()!.Location);
             FileInfo nativeDll = new FileInfo(Path.Combine(fi.DirectoryName!, "LibFT260.dll"));
-            if (!nativeDll.Exists)
+            if (!nativeDll.Exists || nativeDll.Length == 0)
             {
                 string folder = string.Empty;
 
@@ -316,10 +316,11 @@ namespace Mks.Iot.Ftdi.Ft260
                 string? test = Assembly.GetExecutingAssembly().FullName;
 
                 using FileStream fileStream = File.Create(nativeDll.FullName);
-                bool r = Assembly.GetExecutingAssembly().GetManifestStoreToFile($"Biss.Iot.Ftdi.Ft260.Lib.{folder}.LibFT260.dll", fileStream,_log);
+                bool r = Assembly.GetExecutingAssembly().GetManifestStoreToFile($"Mks.Iot.Ftdi.Ft260.Lib.{folder}.LibFT260.dll", fileStream,_log);
                 if (!r)
                 {
                     _log.TryLogError($"[{nameof(Ft260Wraper)}]({nameof(Ft260Wraper)}): Can not store native dll!");
+                    throw new Exception($"Can not store native dll for plattform {folder}");
                 }
             }
 

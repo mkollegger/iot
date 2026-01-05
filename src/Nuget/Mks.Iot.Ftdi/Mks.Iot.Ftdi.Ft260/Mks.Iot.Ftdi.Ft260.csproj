@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 	</PropertyGroup>
 
 	<!-- #region SDK Setting-->
@@ -20,14 +20,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
+		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.101">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Iot.Device.Bindings" Version="4.0.1" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="System.Device.Gpio" Version="4.0.1" />
 	</ItemGroup>
@@ -45,7 +45,7 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Mks.Common\Mks.Common.csproj" />
+		<ProjectReference Include="..\..\Mks.Common\Mks.Common.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="Lib\FTD2XX_NET.dll">
