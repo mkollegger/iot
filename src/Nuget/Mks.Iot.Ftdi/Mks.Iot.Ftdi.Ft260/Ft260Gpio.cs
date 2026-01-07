@@ -70,7 +70,7 @@ public class Ft260Gpio : GpioDriver
     {
         if (_instance == null)
         {
-            _ioController = new Ft260Gpio(Ft260.Create());
+            _ioController = new Ft260Gpio(Ft260Device.Create());
             _instance = new GpioController(_ioController);
         }
 

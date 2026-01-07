@@ -8,7 +8,7 @@
 	<!-- #region SDK Setting-->
 	<Import Project="..\..\mks.iot.projectinfos.proj" />
 	<ItemGroup>
-	  <None Include="..\nugetImage.png" Link="Ext\nugetImage.png">
+	  <None Include="..\nugetImage.png" Link="nugetImage.png">
 	    <PackagePath></PackagePath>
 	    <Pack>True</Pack>
 	  </None>
@@ -25,7 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Ext\Mks.Common.targets">
+	  <None Update="Mks.Common.targets">
 	    <PackagePath>build\</PackagePath>
 	    <Pack>true</Pack>
 	  </None>

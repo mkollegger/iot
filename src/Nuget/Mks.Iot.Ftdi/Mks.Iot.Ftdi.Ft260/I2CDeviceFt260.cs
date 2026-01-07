@@ -71,7 +71,7 @@ public class I2CDeviceFt260 : I2cDevice
     public new static I2cDevice Create(I2cConnectionSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        return new I2CDeviceFt260(settings, Ft260.Create());
+        return new I2CDeviceFt260(settings, Ft260Device.Create());
     }
 
     /// <summary>Reads a byte from the I2C device.</summary>

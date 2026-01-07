@@ -77,7 +77,9 @@ public class MksSsd1306 : Ssd1306
     private readonly string _fontFamiliyName;
     private readonly Lock _writeTextLock = new Lock();
     private EnumMksSsd1306LineModes _lineMode;
-    private ILogger? _log;
+#pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
+    private readonly ILogger? _log;
+#pragma warning restore CS0649 // Field is never assigned to, and will always have its default value
     private int _maxCharPerLine;
     private SKFont _skFont;
     private SKPaint _skPaint;

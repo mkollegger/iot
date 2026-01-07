@@ -67,7 +67,7 @@ public class CommandI2C : Command
 
             _log.TryLogTrace($"[{GetType().Name}]({nameof(CommandI2C)}): I2C command executed");
 
-            Ft260Wrapper? ft260 = Ft260.Create();
+            Ft260Wrapper? ft260 = Ft260Device.Create();
             Console.Write("I2C devices found: ");
             foreach (byte d in ft260.GetI2cDevices())
             {

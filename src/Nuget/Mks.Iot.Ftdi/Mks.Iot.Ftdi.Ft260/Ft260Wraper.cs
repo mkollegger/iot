@@ -399,7 +399,9 @@ namespace Mks.Iot.Ftdi.Ft260
 
             if (!noDebugLog)
             {
+#pragma warning disable CA1873
                 _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(CheckResult)}): Error result - {result}");
+#pragma warning restore CA1873
             }
 
             return false;

@@ -34,7 +34,7 @@ namespace Mks.Iot.Ftdi.Ft260;
 /// <summary>
 ///     <para>Dotnet for FTDI Chip FT260 - HID-class USB to UART/I2C Bridge IC</para>
 /// </summary>
-public class Ft260 : IDisposable
+public class Ft260Device : IDisposable
 {
     private readonly CancellationTokenSource _ctsClose = new CancellationTokenSource();
     private bool _disposedValue;
@@ -42,7 +42,7 @@ public class Ft260 : IDisposable
     /// <summary>
     ///     Dotnet for FTDI Chip FT260 - HID-class USB to UART/I2C Bridge IC
     /// </summary>
-    public Ft260()
+    public Ft260Device()
     {
 #pragma warning disable CA2000 // Dispose objects before losing scope
         Create();
