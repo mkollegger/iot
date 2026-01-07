@@ -26,22 +26,30 @@
 
 #endregion
 
+using System;
 using System.CommandLine;
 using System.CommandLine.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Mks.Common.Ext;
 
 namespace Ft260CliApp.Commands;
 
-public class CommandSeriell : Command
+/// <summary>
+///     Command for Serial operations
+/// </summary>
+public class CommandSerial : Command
 {
-    public CommandSeriell() : base("--seriell", "Execute Serial operations")
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CommandSerial" /> class.
+    /// </summary>
+    public CommandSerial() : base("--serial", "Execute Serial operations")
     {
         this.SetHandler(context =>
         {
-            var host = context.GetHost();
-            var log = host.Services.GetRequiredService<ILogger<CommandSeriell>>();
+            IHost? host = context.GetHost();
+            ILogger<CommandSerial> log = host.Services.GetRequiredService<ILogger<CommandSerial>>();
             log.TryLogInformation("Serial command executed");
 
             throw new NotImplementedException("Coming soon ...");

@@ -26,24 +26,32 @@
 
 #endregion
 
+using System;
 using System.CommandLine;
 using System.CommandLine.Hosting;
 using System.Device.Gpio;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Mks.Common.Ext;
 using Mks.Iot.Ftdi.Ft260;
 
 namespace Ft260CliApp.Commands;
 
+/// <summary>
+///     Command for GPIO operations
+/// </summary>
 public class CommandGpio : Command
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CommandGpio" /> class.
+    /// </summary>
     public CommandGpio() : base("--gpio", "Execute GPIO operations")
     {
         this.SetHandler(async context =>
         {
-            var host = context.GetHost();
-            var log = host.Services.GetRequiredService<ILogger<CommandGpio>>();
+            IHost? host = context.GetHost();
+            ILogger<CommandGpio> log = host.Services.GetRequiredService<ILogger<CommandGpio>>();
 
             log.TryLogInformation("GPIO command executed");
 
@@ -52,16 +60,16 @@ public class CommandGpio : Command
             Console.WriteLine("GPIO on pin 3 shows changes (input)");
             Console.WriteLine("Press any key to stop - automatic stops in 10s");
 
-            using var gpio = Ft260Gpio.Create();
-            var pinLed = gpio.OpenPin(2, PinMode.Output);
-            var pinInput = gpio.OpenPin(3, PinMode.Input);
+            using GpioController? gpio = Ft260Gpio.Create();
+            GpioPin pinLed = gpio.OpenPin(2, PinMode.Output);
+            GpioPin pinInput = gpio.OpenPin(3, PinMode.Input);
 
             pinInput.ValueChanged += OnPinInputOnValueChanged;
 
             int counter = 0;
             do
             {
-                await Task.Delay(250);
+                await Task.Delay(250).ConfigureAwait(true);
                 pinLed.Toggle();
                 counter++;
                 if (Console.KeyAvailable || counter >= 40)

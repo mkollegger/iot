@@ -270,30 +270,38 @@ namespace Mks.Iot.Ftdi.Ft260
     #endregion
 
     /// <summary>
-    ///     <para>Wraper für die LibFT260</para>
-    ///     Klasse FT260Net. (C) 2022 FOTEC Forschungs- und Technologietransfer GmbH
+    ///     <para>Wrapper for LibFT260</para>
     /// </summary>
 #pragma warning disable CA1060 // Move pinvokes to native methods class
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
-    public class Ft260Wraper : IDisposable
+    public class Ft260Wrapper : IDisposable
 #pragma warning restore CA1060 // Move pinvokes to native methods class
     {
         private const string DllLocation = @"LibFT260.dll";
         private readonly uint _ft260I2C_DEVICE = 0;
         private readonly ushort _ft260PID = 0x6030;
         private readonly ushort _ft260VID = 0x0403;
+
+        private readonly ILogger? _log;
         private bool _disposedValue;
         private IntPtr _ft260Handle = IntPtr.Zero;
 
-        private readonly ILogger? _log;
+        public List<byte> I2cDevices = new List<byte>();
 
         /// <summary>
-        ///     Wraper für die LibFT260 von FTDI
+        ///     Wrapper for LibFT260 (FTDI)
         /// </summary>
-        public Ft260Wraper(ILogger? logger = null)
+        public Ft260Wrapper(ILogger? logger = null)
         {
             _log = logger;
 
+            // Check - only windows is supported at the moment
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                _log?.TryLogError($"[{nameof(Ft260Wrapper)}]({nameof(Ft260Wrapper)}): Only Windows OS is supported at the moment!");
+                throw new PlatformNotSupportedException("Only Windows OS is supported at the moment!");
+            }
+            
             FileInfo fi = new FileInfo(Assembly.GetEntryAssembly()!.Location);
             FileInfo nativeDll = new FileInfo(Path.Combine(fi.DirectoryName!, "LibFT260.dll"));
             if (!nativeDll.Exists || nativeDll.Length == 0)
@@ -313,28 +321,24 @@ namespace Mks.Iot.Ftdi.Ft260
                         break;
                 }
 
-                string? test = Assembly.GetExecutingAssembly().FullName;
-
                 using FileStream fileStream = File.Create(nativeDll.FullName);
-                bool r = Assembly.GetExecutingAssembly().GetManifestStoreToFile($"Mks.Iot.Ftdi.Ft260.Lib.{folder}.LibFT260.dll", fileStream,_log);
+                bool r = Assembly.GetExecutingAssembly().GetManifestStoreToFile($"Mks.Iot.Ftdi.Ft260.Lib.{folder}.LibFT260.dll", fileStream, _log);
                 if (!r)
                 {
-                    _log.TryLogError($"[{nameof(Ft260Wraper)}]({nameof(Ft260Wraper)}): Can not store native dll!");
-                    throw new Exception($"Can not store native dll for plattform {folder}");
+                    _log.TryLogError($"[{nameof(Ft260Wrapper)}]({nameof(Ft260Wrapper)}): Can not store native dll!");
+                    throw new Exception($"Can not store native dll for platform {folder}");
                 }
             }
 
             Open();
 
-            _log.TryLogInfo($"[{nameof(Ft260Wraper)}]({nameof(Ft260Wraper)}): Nativ Lib version: {GetLibVersion()}");
-            _log.TryLogInfo($"[{nameof(Ft260Wraper)}]({nameof(Ft260Wraper)}): Chip version: {GetChipVersion()}");
+            _log.TryLogInfo($"[{nameof(Ft260Wrapper)}]({nameof(Ft260Wrapper)}): Native Lib version: {GetLibVersion()}");
+            _log.TryLogInfo($"[{nameof(Ft260Wrapper)}]({nameof(Ft260Wrapper)}): Chip version: {GetChipVersion()}");
         }
-
-        public List<byte> I2cDevices = new List<byte>();
 
 
         /// <summary>
-        ///     Welche I2C Geräte wurden am Bus gefunden
+        ///     Which I2C devices were found on the bus
         /// </summary>
         /// <returns></returns>
         public List<byte> GetI2cDevices(bool forceUpdate = false)
@@ -363,7 +367,7 @@ namespace Mks.Iot.Ftdi.Ft260
                     s += "0x" + b.ToString("X2", CultureInfo.CurrentCulture) + " ";
                 }
 
-                _log.TryLogTrace($"[{nameof(Ft260Wraper)}]({nameof(GetI2cDevices)}): {r.Count} slave(s) at {s}");
+                _log.TryLogTrace($"[{nameof(Ft260Wrapper)}]({nameof(GetI2cDevices)}): {r.Count} slave(s) at {s}");
             }
 
             I2cDevices = r;
@@ -371,17 +375,17 @@ namespace Mks.Iot.Ftdi.Ft260
         }
 
         /// <summary>
-        ///     Uart - nicht (fertig) implementiert
+        ///     Uart - not (fully) implemented
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
         public void UART_Init()
         {
-            throw new NotImplementedException("Native Funktionen fertig vorbereitet. Aber nicht aufbereitet. Wird zurzeit nicht unterstützt.");
+            throw new NotImplementedException("Native functions ready prepared. But not processed. Not supported at the moment.");
         }
 
 
         /// <summary>
-        ///     Rückgabe der nativen DLL prüfen
+        ///     Check native DLL return value
         /// </summary>
         /// <param name="result"></param>
         /// <param name="noDebugLog"></param>
@@ -395,14 +399,14 @@ namespace Mks.Iot.Ftdi.Ft260
 
             if (!noDebugLog)
             {
-                _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(CheckResult)}): Error result - {result}");
+                _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(CheckResult)}): Error result - {result}");
             }
 
             return false;
         }
 
         /// <summary>
-        ///     Prüfen ob eine Kommunikation möglich ist
+        ///     Check if communication is possible
         /// </summary>
         /// <exception cref="Exception"></exception>
         private void Check()
@@ -416,7 +420,7 @@ namespace Mks.Iot.Ftdi.Ft260
         #region General Functions
 
         /// <summary>
-        ///     Anzahl der HID Devices
+        ///     Number of HID Devices
         /// </summary>
         /// <returns></returns>
         public ulong CreateDeviceList()
@@ -433,7 +437,7 @@ namespace Mks.Iot.Ftdi.Ft260
         }
 
         /// <summary>
-        ///     Alle HID Devices
+        ///     All HID Devices
         /// </summary>
         /// <returns></returns>
         public List<string> GetDevicePath()
@@ -455,7 +459,7 @@ namespace Mks.Iot.Ftdi.Ft260
         }
 
         /// <summary>
-        ///     Zum Gerät verbinden
+        ///     Connect to device
         /// </summary>
         /// <returns></returns>
         public bool Open()
@@ -463,14 +467,14 @@ namespace Mks.Iot.Ftdi.Ft260
             bool r = CheckResult(FT260_OpenByVidPid(_ft260VID, _ft260PID, _ft260I2C_DEVICE, out _ft260Handle));
             if (r)
             {
-                _log.TryLogInfo($"[{nameof(Ft260Wraper)}]({nameof(Open)}): Chip Version {GetChipVersion()}");
+                _log.TryLogInfo($"[{nameof(Ft260Wrapper)}]({nameof(Open)}): Chip Version {GetChipVersion()}");
             }
 
             return r;
         }
 
         /// <summary>
-        ///     Verbindung zum Gerät schließen
+        ///     Close connection to device
         /// </summary>
         public void Close()
         {
@@ -559,7 +563,7 @@ namespace Mks.Iot.Ftdi.Ft260
         }
 
         /// <summary>
-        ///     Version der nativen FT260 DLL
+        ///     Version of native FT260 DLL
         /// </summary>
         /// <returns></returns>
         public string GetLibVersion()
@@ -585,7 +589,7 @@ namespace Mks.Iot.Ftdi.Ft260
         }
 
         /// <summary>
-        ///     Version der nativen FT260 DLL
+        ///     Version of native FT260 DLL (Chip Version)
         /// </summary>
         /// <returns></returns>
         public string GetChipVersion()
@@ -667,8 +671,8 @@ namespace Mks.Iot.Ftdi.Ft260
         /// <summary>
         ///     Read the status of the I2C master controller.
         /// </summary>
-        /// <param name="noDebugLog">Keine Debug Ausgaben</param>
-        /// <param name="scan">"schenlles" scannen nach Slaves</param>
+        /// <param name="noDebugLog">No debug output</param>
+        /// <param name="scan">"quick" scan for slaves</param>
         /// <returns></returns>
         public Ft260I2cControllerStatus I2CMaster_GetStatus(bool noDebugLog = false, bool scan = false)
         {
@@ -706,38 +710,38 @@ namespace Mks.Iot.Ftdi.Ft260
                 {
                     if (s.HasFlag(Ft260I2cControllerStatus.Busy))
                     {
-                        _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Controller busy");
+                        _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Controller busy");
                     }
                     else
                     {
                         if (s.HasFlag(Ft260I2cControllerStatus.Error))
                         {
-                            _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Error condition");
+                            _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Error condition");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.AddressNack))
                         {
-                            _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Slave address was not acknowledged during last operation");
+                            _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Slave address was not acknowledged during last operation");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.DataNack))
                         {
-                            _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Data not acknowledged during last operation");
+                            _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Data not acknowledged during last operation");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.ArbitrationLost))
                         {
-                            _log.LogError($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Arbitration lost during last operation");
+                            _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Arbitration lost during last operation");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.Idle))
                         {
-                            //_log.TryLogTrace($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Controller idle");
+                            //_log.TryLogTrace($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Controller idle");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.BusBusy))
                         {
-                            _log.LogWarning($"[{nameof(Ft260Wraper)}]({nameof(I2CMaster_GetStatus)}): Bus busy");
+                            _log.LogWarning($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Bus busy");
                         }
                     }
                 }
@@ -759,8 +763,8 @@ namespace Mks.Iot.Ftdi.Ft260
         ///     A timer counter to check I2C read status from the device If times up, the I2C will return an
         ///     error message FT260_I2C_READ_FAIL The default value is 5000(5 sec)
         /// </param>
-        /// <param name="noDebugLog">Keine Debug Ausgaben</param>
-        /// <param name="scan">"schenlles" scannen nach Slaves</param>
+        /// <param name="noDebugLog">No debug output</param>
+        /// <param name="scan">"quick" scan for slaves</param>
         /// <returns></returns>
         public (List<byte>? data, Ft260I2cControllerStatus status) I2CMaster_Read(byte deviceAddress, FT260_I2C_FLAG flag, uint bytesToRead, ulong wait_timer = 5000, bool noDebugLog = false, bool scan = false)
         {
@@ -802,7 +806,7 @@ namespace Mks.Iot.Ftdi.Ft260
         /// </summary>
         /// <param name="deviceAddress">Address of the target I2C slave.</param>
         /// <param name="flag">I2C condition</param>
-        /// <param name="data">Daten</param>
+        /// <param name="data">Data</param>
         /// <returns></returns>
         public (int bytesWritten, Ft260I2cControllerStatus status) I2CMaster_Write(byte deviceAddress, FT260_I2C_FLAG flag, List<byte> data)
         {
@@ -890,10 +894,10 @@ namespace Mks.Iot.Ftdi.Ft260
         private readonly List<FT260_GPIO> _pinsConfiguredAsGpio = new List<FT260_GPIO>();
 
         /// <summary>
-        ///     Prüfen ob ein Pin als GPIO konfiguriert ist
+        ///     Check if a pin is configured as GPIO
         /// </summary>
         /// <param name="pin">Pin</param>
-        /// <param name="asGpio">Als Gpio konfigurieren (oder diese aufheben)</param>
+        /// <param name="asGpio">Configure as Gpio (or disable)</param>
         public void GpioCheckConfig(FT260_GPIO pin, bool asGpio = true)
         {
             if (asGpio)
@@ -953,7 +957,7 @@ namespace Mks.Iot.Ftdi.Ft260
                         FT260_EnableI2CPin(_ft260Handle, true);
                         break;
                     case FT260_GPIO.FT260_GPIO_2:
-                        //Default setzen (aus Datenblatt)
+                        //Set default (from datasheet)
                         FT260_SelectGpio2Function(_ft260Handle, FT260_GPIO2_Pin.FT260_GPIO2_SUSPOUT);
                         break;
                     case FT260_GPIO.FT260_GPIO_3:
@@ -964,7 +968,7 @@ namespace Mks.Iot.Ftdi.Ft260
                         FT260_EnableDcdRiPin(_ft260Handle, true);
                         break;
                     case FT260_GPIO.FT260_GPIO_A:
-                        //Default setzen (aus Datenblatt)
+                        //Set default (from datasheet)
                         FT260_SelectGpioAFunction(_ft260Handle, FT260_GPIOA_Pin.FT260_GPIOA_TX_ACTIVE);
                         break;
                     case FT260_GPIO.FT260_GPIO_B:
@@ -976,7 +980,7 @@ namespace Mks.Iot.Ftdi.Ft260
                         FT260_SetGPIOToUartPin(_ft260Handle);
                         break;
                     case FT260_GPIO.FT260_GPIO_G:
-                        //Default setzen (aus Datenblatt)
+                        //Set default (from datasheet)
                         FT260_SelectGpioGFunction(_ft260Handle, FT260_GPIOG_Pin.FT260_GPIOG_BCD_DET);
                         break;
                     default:

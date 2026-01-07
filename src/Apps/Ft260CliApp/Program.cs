@@ -26,6 +26,7 @@
 
 #endregion
 
+using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
@@ -39,7 +40,7 @@ namespace Ft260CliApp
 {
     internal class Program
     {
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             if (Debugger.IsAttached && args.Length == 0)
             {
@@ -47,13 +48,13 @@ namespace Ft260CliApp
                 args = ["--i2c"];
             }
 
-            var rootCommand = new RootCommand("FT260 CLI Application");
+            RootCommand rootCommand = new RootCommand("FT260 CLI Application");
 
             rootCommand.AddCommand(new CommandI2C());
-            rootCommand.AddCommand(new CommandSeriell());
+            rootCommand.AddCommand(new CommandSerial());
             rootCommand.AddCommand(new CommandGpio());
 
-            var parser = new CommandLineBuilder(rootCommand)
+            Parser parser = new CommandLineBuilder(rootCommand)
                 .UseHost(_ => Host.CreateDefaultBuilder(args), host =>
                 {
                     host.ConfigureLogging(logging =>
@@ -66,7 +67,7 @@ namespace Ft260CliApp
                 .UseDefaults()
                 .Build();
 
-            await parser.InvokeAsync(args);
+            await parser.InvokeAsync(args).ConfigureAwait(true);
 
             if (Debugger.IsAttached)
             {

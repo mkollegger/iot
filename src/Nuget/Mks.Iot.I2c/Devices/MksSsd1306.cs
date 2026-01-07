@@ -44,22 +44,22 @@ namespace Mks.Iot.I2c.Devices;
 #region Enums
 
 /// <summary>
-///     Line Modes für BissSsd1306
+///     Line Modes for MksSsd1306
 /// </summary>
-public enum EnumBissSsd1306LineModes
+public enum EnumMksSsd1306LineModes
 {
     /// <summary>
-    ///     4 Zeilen, 25 Zeichen pro Zeile
+    ///     4 lines, 25 characters per line
     /// </summary>
     LineMode4,
 
     /// <summary>
-    ///     2 Zeilen, 13 Zeichen pro Zeile
+    ///     2 lines, 13 characters per line
     /// </summary>
     LineMode2,
 
     /// <summary>
-    ///     1 Zeile, 13 Zeichen pro Zeile
+    ///     1 line, 13 characters per line
     /// </summary>
     LineMode1
 }
@@ -67,8 +67,8 @@ public enum EnumBissSsd1306LineModes
 #endregion
 
 /// <summary>
-///     <para>Ssd1306 - BISS Impementierung</para>
-///     Klasse BissSsd1306.
+///     <para>Ssd1306 - MKS Implementation</para>
+///     Class MksSsd1306.
 ///     https://github.com/dotnet/iot/tree/main/src/devices/Ssd13xx
 ///     https://github.com/dotnet/iot/blob/main/src/devices/Ssd13xx/samples/i2c/Ssd13xx.Samples
 /// </summary>
@@ -76,20 +76,20 @@ public class MksSsd1306 : Ssd1306
 {
     private readonly string _fontFamiliyName;
     private readonly Lock _writeTextLock = new Lock();
-    private EnumBissSsd1306LineModes _lineMode;
+    private EnumMksSsd1306LineModes _lineMode;
+    private ILogger? _log;
     private int _maxCharPerLine;
     private SKFont _skFont;
     private SKPaint _skPaint;
-    private ILogger? _log;
 
     /// <summary>
-    ///     Ssd1306 - BISS Impementierung
+    ///     Ssd1306 - MKS Implementation
     /// </summary>
     /// <param name="i2CDevice">I²C Device</param>
-    /// <param name="lineModes">Modi für Textausgabe</param>
-    /// <param name="fontFamiliyName">Font - Default ist "Courier New"</param>
+    /// <param name="lineModes">Modes for text output</param>
+    /// <param name="fontFamiliyName">Font - Default is "Courier New"</param>
     public MksSsd1306(I2cDevice i2CDevice,
-        EnumBissSsd1306LineModes lineModes = EnumBissSsd1306LineModes.LineMode2,
+        EnumMksSsd1306LineModes lineModes = EnumMksSsd1306LineModes.LineMode2,
         string fontFamiliyName = "Courier New") : base(i2CDevice, 128, 32)
     {
         ArgumentNullException.ThrowIfNull(i2CDevice);
@@ -112,7 +112,7 @@ public class MksSsd1306 : Ssd1306
     ///     Changing the line mode will adjust the maximum number of characters per line and the
     ///     font size used for rendering text.
     /// </remarks>
-    public EnumBissSsd1306LineModes LineMode
+    public EnumMksSsd1306LineModes LineMode
     {
         get { return _lineMode; }
         set
@@ -127,15 +127,15 @@ public class MksSsd1306 : Ssd1306
             int fontSize;
             switch (_lineMode)
             {
-                case EnumBissSsd1306LineModes.LineMode4:
+                case EnumMksSsd1306LineModes.LineMode4:
                     _maxCharPerLine = 25;
                     fontSize = 8;
                     break;
-                case EnumBissSsd1306LineModes.LineMode2:
+                case EnumMksSsd1306LineModes.LineMode2:
                     _maxCharPerLine = 13;
                     fontSize = 16;
                     break;
-                case EnumBissSsd1306LineModes.LineMode1:
+                case EnumMksSsd1306LineModes.LineMode1:
                     _maxCharPerLine = 8;
                     fontSize = 32;
                     break;
@@ -160,11 +160,11 @@ public class MksSsd1306 : Ssd1306
     #endregion
 
     /// <summary>
-    ///     Textausgabe auf dem Display
+    ///     Text output on the display
     /// </summary>
     /// <param name="text">Text</param>
-    /// <param name="row">Zeile</param>
-    /// <param name="textAlign">Textausrichtung</param>
+    /// <param name="row">Row</param>
+    /// <param name="textAlign">Text alignment</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void WriteText(string text, int row, SKTextAlign textAlign = SKTextAlign.Left)
     {
@@ -189,7 +189,7 @@ public class MksSsd1306 : Ssd1306
 
             switch (_lineMode)
             {
-                case EnumBissSsd1306LineModes.LineMode4:
+                case EnumMksSsd1306LineModes.LineMode4:
                     if (row < 0 || row > 3)
                     {
                         throw new ArgumentOutOfRangeException(nameof(row), "Row number must be between 0 and 3.");
@@ -197,7 +197,7 @@ public class MksSsd1306 : Ssd1306
 
                     SendCommand(new SetPageAddress((PageAddress) row));
                     break;
-                case EnumBissSsd1306LineModes.LineMode2:
+                case EnumMksSsd1306LineModes.LineMode2:
                     if (row < 0 || row > 1)
                     {
                         throw new ArgumentOutOfRangeException(nameof(row), "Row number must be between 0 and 1.");
@@ -205,7 +205,7 @@ public class MksSsd1306 : Ssd1306
 
                     SendCommand(new SetPageAddress((PageAddress) (row * 2)));
                     break;
-                case EnumBissSsd1306LineModes.LineMode1:
+                case EnumMksSsd1306LineModes.LineMode1:
                     if (row != 0)
                     {
                         throw new ArgumentOutOfRangeException(nameof(row), "Row number must be 0 for single line mode.");
@@ -252,7 +252,7 @@ public class MksSsd1306 : Ssd1306
     }
 
     /// <summary>
-    ///     Zeile löschen
+    ///     Clear line
     /// </summary>
     /// <param name="lineNumber"></param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>

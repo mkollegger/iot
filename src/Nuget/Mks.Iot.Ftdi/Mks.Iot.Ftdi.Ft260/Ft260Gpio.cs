@@ -37,7 +37,6 @@ namespace Mks.Iot.Ftdi.Ft260;
 
 /// <summary>
 ///     <para>Gpio Driver for Ft260</para>
-///     Klasse Ft260Gpio. (C) 2025 FOTEC Forschungs- und Technologietransfer GmbH
 /// </summary>
 public class Ft260Gpio : GpioDriver
 {
@@ -46,10 +45,10 @@ public class Ft260Gpio : GpioDriver
 
     private readonly Dictionary<PinChangeEventHandler, int> _callbacks = new();
     private readonly Dictionary<int, bool> _currentPinValue = new();
-    private readonly Ft260Wraper _ft260;
+    private readonly Ft260Wrapper _ft260;
     private Task? _eventWorker;
 
-    internal Ft260Gpio(Ft260Wraper ft260)
+    internal Ft260Gpio(Ft260Wrapper ft260)
     {
         ArgumentNullException.ThrowIfNull(ft260);
         _ft260 = ft260;
@@ -63,8 +62,9 @@ public class Ft260Gpio : GpioDriver
     #endregion
 
     /// <summary>
+    ///     Creates a GpioController instance using Ft260
     /// </summary>
-    /// <returns></returns>
+    /// <returns>GpioController</returns>
     /// <exception cref="PlatformNotSupportedException"></exception>
     public static GpioController Create()
     {
@@ -135,7 +135,7 @@ public class Ft260Gpio : GpioDriver
     /// <inheritdoc />
     protected override void ClosePin(int pinNumber)
     {
-        FT260_GPIO p = ConvertToFt260Gpio(pinNumber);
+        //FT260_GPIO p = ConvertToFt260Gpio(pinNumber);
     }
 
     /// <inheritdoc />
@@ -153,7 +153,6 @@ public class Ft260Gpio : GpioDriver
             case PinMode.InputPullDown:
             case PinMode.InputPullUp:
                 throw new NotSupportedException($"Pin mode {mode} is not supported by Ft260.");
-                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
         }
@@ -169,7 +168,7 @@ public class Ft260Gpio : GpioDriver
             throw new InvalidOperationException("Failed to get GPIO configuration.");
         }
 
-        int set = 0;
+        int set;
         if (pinNumber <= 5)
         {
             set = tmp.Value.dir & (ushort) p;
@@ -254,7 +253,7 @@ public class Ft260Gpio : GpioDriver
                         {
                             _currentPinValue[pin] = val.Value;
                             PinEventTypes changeType = val.Value ? PinEventTypes.Rising : PinEventTypes.Falling;
-                            foreach (var cb in _callbacks
+                            foreach (PinChangeEventHandler cb in _callbacks
                                 .Where(w => w.Value == pin)
                                 .Select(s => s.Key))
                             {

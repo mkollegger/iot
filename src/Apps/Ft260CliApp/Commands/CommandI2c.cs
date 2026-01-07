@@ -26,41 +26,50 @@
 
 #endregion
 
-using System.CommandLine;
-using System.CommandLine.Hosting;
-using System.Device.I2c;
-using System.Diagnostics;
-using System.Drawing;
 using Iot.Device.Graphics;
 using Iot.Device.Graphics.SkiaSharpAdapter;
+using Iot.Device.Pcx857x;
 using Iot.Device.Ssd13xx.Commands.Ssd1306Commands;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Mks.Common.Ext;
 using Mks.Iot.Ftdi.Ft260;
 using Mks.Iot.I2c.Devices;
 using SkiaSharp;
+using System;
+using System.CommandLine;
+using System.CommandLine.Hosting;
+using System.Device.I2c;
+using System.Diagnostics;
+using System.Drawing;
 
 namespace Ft260CliApp.Commands;
 
+/// <summary>
+///     Command for I2C operations
+/// </summary>
 public class CommandI2C : Command
 {
     private ILogger<CommandI2C>? _log;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CommandI2C" /> class.
+    /// </summary>
     public CommandI2C() : base("--i2c", "Execute I2C operations")
     {
         // Setup arguments and options here
 
         this.SetHandler(context =>
         {
-            var host = context.GetHost();
+            IHost? host = context.GetHost();
             _log = host.Services.GetRequiredService<ILogger<CommandI2C>>();
 
             _log.TryLogTrace($"[{GetType().Name}]({nameof(CommandI2C)}): I2C command executed");
 
-            var ft260 = Ft260.Create();
+            Ft260Wrapper? ft260 = Ft260.Create();
             Console.Write("I2C devices found: ");
-            foreach (var d in ft260.GetI2cDevices())
+            foreach (byte d in ft260.GetI2cDevices())
             {
                 Console.Write($"0x{d:X2} ");
             }
@@ -72,12 +81,18 @@ public class CommandI2C : Command
                 Console.WriteLine("Found SSD1306 display");
 
                 using I2cDevice i2CDevice = I2CDeviceFt260.Create(new I2cConnectionSettings(1, 0x3C));
-                using MksSsd1306 device = new MksSsd1306(i2CDevice, EnumBissSsd1306LineModes.LineMode1);
+                using MksSsd1306 device = new MksSsd1306(i2CDevice, EnumMksSsd1306LineModes.LineMode1);
 
                 device.ClearScreen();
                 DisplayClock(device);
 
                 BitTest(device);
+            }
+
+            if (ft260.I2cDevices.Contains(0x20))
+            {
+                var pcf8574 = new Pcf8574(I2CDeviceFt260.Create(new I2cConnectionSettings(1, 0x20)));
+                pcf8574.WriteByte(0x33);
             }
         });
     }
@@ -92,7 +107,7 @@ public class CommandI2C : Command
         int y = 0;
 
         using BitmapImage image = BitmapImage.CreateBitmap(128, 64, PixelFormat.Format32bppArgb);
-        using var paint = new SKPaint();
+        using SKPaint paint = new SKPaint();
 
         paint.Color = SKColors.White;
         paint.Style = SKPaintStyle.Stroke;
@@ -106,13 +121,14 @@ public class CommandI2C : Command
 
         image.Clear(Color.Black);
         IGraphics g = image.GetDrawingApi();
-        string text = DateTime.Now.ToString("HH:mm:ss") + "\nHallo Welt!";
+        string text = DateTime.Now.ToString("HH:mm:ss") + "\nHello World!";
         _log.TryLogInfo($"({nameof(DisplayClock)}): {text}");
         g.DrawText(text, font, fontSize, Color.White, new Point(0, y));
         ssd1306.DrawBitmap(image);
         _log.TryLogInfo($"({nameof(DisplayClock)}): Done!");
     }
 
+    // ReSharper disable once UnusedMember.Local
     private void DisplayImages(GraphicDisplay ssd1306)
     {
         Console.WriteLine("Display Images");
@@ -126,11 +142,8 @@ public class CommandI2C : Command
 
     private void BitTest(MksSsd1306 ssd1306)
     {
-        byte[] data = new byte[128];
-
         byte b = 1;
         Stopwatch sw = Stopwatch.StartNew();
-
         int counter = 0;
 
         do
@@ -148,7 +161,7 @@ public class CommandI2C : Command
             }
 
             sw.Stop();
-            _log.TryLogInfo($"Refrash rate: {sw.ElapsedMilliseconds} ms");
+            _log.TryLogInfo($"Refresh rate: {sw.ElapsedMilliseconds} ms");
 
             if (counter++ >= 128)
             {

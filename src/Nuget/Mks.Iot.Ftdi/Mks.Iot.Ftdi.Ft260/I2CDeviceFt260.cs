@@ -41,14 +41,14 @@ namespace Mks.Iot.Ftdi.Ft260;
 /// </summary>
 public class I2CDeviceFt260 : I2cDevice
 {
-    private readonly Ft260Wraper _ft260Base;
-    private readonly byte _slaveAdress;
+    private readonly Ft260Wrapper _ft260Base;
+    private readonly byte _slaveAddress;
 
-    internal I2CDeviceFt260(I2cConnectionSettings settings, Ft260Wraper i2CFt260)
+    internal I2CDeviceFt260(I2cConnectionSettings settings, Ft260Wrapper i2CFt260)
     {
         ConnectionSettings = settings;
         _ft260Base = i2CFt260;
-        _slaveAdress = (byte) settings.DeviceAddress;
+        _slaveAddress = (byte) settings.DeviceAddress;
     }
 
     #region Properties
@@ -63,6 +63,7 @@ public class I2CDeviceFt260 : I2cDevice
     #endregion
 
     /// <summary>
+    ///     Creates a new I2CDeviceFt260
     /// </summary>
     /// <param name="settings"></param>
     /// <returns></returns>
@@ -77,7 +78,7 @@ public class I2CDeviceFt260 : I2cDevice
     /// <returns>A byte read from the I2C device.</returns>
     public override byte ReadByte()
     {
-        (List<byte>? data, Ft260I2cControllerStatus status) result = _ft260Base.I2CMaster_Read(_slaveAdress, FT260_I2C_FLAG.FT260_I2C_START_AND_STOP, 1);
+        (List<byte>? data, Ft260I2cControllerStatus status) result = _ft260Base.I2CMaster_Read(_slaveAddress, FT260_I2C_FLAG.FT260_I2C_START_AND_STOP, 1);
         if (result.data == null || result.data.Count <= 0)
         {
             return 0;
@@ -98,7 +99,7 @@ public class I2CDeviceFt260 : I2cDevice
             throw new ArgumentException($"{nameof(buffer)} cannot be empty.");
         }
 
-        (List<byte>? data, Ft260I2cControllerStatus status) result = _ft260Base.I2CMaster_Read(_slaveAdress, FT260_I2C_FLAG.FT260_I2C_START_AND_STOP, (uint) buffer.Length);
+        (List<byte>? data, Ft260I2cControllerStatus status) result = _ft260Base.I2CMaster_Read(_slaveAddress, FT260_I2C_FLAG.FT260_I2C_START_AND_STOP, (uint) buffer.Length);
         if (result.data == null || result.data.Count <= 0)
         {
             return;
@@ -111,7 +112,7 @@ public class I2CDeviceFt260 : I2cDevice
     /// <param name="value">The byte to be written to the I2C device.</param>
     public override void WriteByte(byte value)
     {
-        _ft260Base.I2CMaster_Write(_slaveAdress, FT260_I2C_FLAG.FT260_I2C_START_AND_STOP, new List<byte> {value});
+        _ft260Base.I2CMaster_Write(_slaveAddress, FT260_I2C_FLAG.FT260_I2C_START_AND_STOP, new List<byte> {value});
     }
 
     /// <summary>Writes data to the I2C device.</summary>
@@ -126,7 +127,7 @@ public class I2CDeviceFt260 : I2cDevice
             throw new ArgumentException($"{nameof(buffer)} cannot be empty.");
         }
 
-        _ft260Base.I2CMaster_Write(_slaveAdress, FT260_I2C_FLAG.FT260_I2C_START_AND_STOP, buffer.ToArray().ToList());
+        _ft260Base.I2CMaster_Write(_slaveAddress, FT260_I2C_FLAG.FT260_I2C_START_AND_STOP, buffer.ToArray().ToList());
     }
 
     /// <summary>
@@ -153,8 +154,8 @@ public class I2CDeviceFt260 : I2cDevice
             throw new ArgumentException($"{nameof(readBuffer)} cannot be empty.");
         }
 
-        _ft260Base.I2CMaster_Write(_slaveAdress, FT260_I2C_FLAG.FT260_I2C_START, writeBuffer.ToArray().ToList());
-        (List<byte>? data, Ft260I2cControllerStatus status) result = _ft260Base.I2CMaster_Read(_slaveAdress, FT260_I2C_FLAG.FT260_I2C_STOP, (uint) readBuffer.Length);
+        _ft260Base.I2CMaster_Write(_slaveAddress, FT260_I2C_FLAG.FT260_I2C_START, writeBuffer.ToArray().ToList());
+        (List<byte>? data, Ft260I2cControllerStatus status) result = _ft260Base.I2CMaster_Read(_slaveAddress, FT260_I2C_FLAG.FT260_I2C_STOP, (uint) readBuffer.Length);
         if (result.data == null || result.data.Count <= 0)
         {
             return;
