@@ -70,8 +70,9 @@ public enum EnumBissSsd1306LineModes
 ///     <para>Ssd1306 - BISS Impementierung</para>
 ///     Klasse BissSsd1306.
 ///     https://github.com/dotnet/iot/tree/main/src/devices/Ssd13xx
+///     https://github.com/dotnet/iot/blob/main/src/devices/Ssd13xx/samples/i2c/Ssd13xx.Samples
 /// </summary>
-public class BissSsd1306 : Ssd1306
+public class MksSsd1306 : Ssd1306
 {
     private readonly string _fontFamiliyName;
     private readonly Lock _writeTextLock = new Lock();
@@ -87,7 +88,7 @@ public class BissSsd1306 : Ssd1306
     /// <param name="i2CDevice">I²C Device</param>
     /// <param name="lineModes">Modi für Textausgabe</param>
     /// <param name="fontFamiliyName">Font - Default ist "Courier New"</param>
-    public BissSsd1306(I2cDevice i2CDevice,
+    public MksSsd1306(I2cDevice i2CDevice,
         EnumBissSsd1306LineModes lineModes = EnumBissSsd1306LineModes.LineMode2,
         string fontFamiliyName = "Courier New") : base(i2CDevice, 128, 32)
     {

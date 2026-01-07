@@ -1,14 +1,13 @@
 <Solution>
-  <Folder Name="/Common/" />
+  <Folder Name="/Apps/">
+    <Project Path="Apps/Ft260CliApp/Ft260CliApp.csproj" Id="df583c1f-42ee-468c-b934-7c8f26e62723" />
+  </Folder>
   <Folder Name="/Nuget/">
     <Project Path="Nuget/Mks.Common/Mks.Common.csproj" Id="719ebeaf-e647-4c3f-ac6c-e4eaea0c61ec" />
     <Project Path="Nuget/Mks.Iot.I2c/Mks.Iot.I2c.csproj" />
   </Folder>
   <Folder Name="/Nuget/Mks.Iot.Ftdi/">
     <Project Path="Nuget/Mks.Iot.Ftdi/Mks.Iot.Ftdi.Ft260/Mks.Iot.Ftdi.Ft260.csproj" />
-  </Folder>
-  <Folder Name="/Tests/">
-    <Project Path="Tests/I2cTests/I2cTests.csproj" />
   </Folder>
   <Folder Name="/_Solution Items/">
     <File Path="../.editorconfig" />

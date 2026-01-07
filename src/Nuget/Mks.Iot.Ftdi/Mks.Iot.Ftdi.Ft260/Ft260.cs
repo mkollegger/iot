@@ -252,7 +252,9 @@ public class Ft260 : IDisposable
 {
     private static byte _sampleCounter;
     private static bool _sampleBoolean;
-    private static List<byte> _slaves = new List<byte>();
+    /// <summary>
+    /// List of I2C slave addresses.
+    /// </summary>
     private readonly bool _backgroundWorking = false;
     private readonly CancellationTokenSource _ctsClose = new CancellationTokenSource();
     private bool _disposedValue;
@@ -292,9 +294,8 @@ public class Ft260 : IDisposable
         {
             Ft260Base = new Ft260Wraper();
             Ft260Base.I2CMaster_Init();
-            _slaves = Ft260Base.GetI2cSlaves();
+            Ft260Base.GetI2cDevices(true);
         }
-
         return Ft260Base;
     }
 
@@ -316,12 +317,12 @@ public class Ft260 : IDisposable
 
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
-            if (_slaves.Contains(0x20))
+            if (Ft260Base.I2cDevices.Contains(0x20))
             {
                 _pcf8574 = new Pcf8574(I2CDeviceFt260.Create(new I2cConnectionSettings(1, 0x20)));
             }
 
-            if (_slaves.Contains(0x3C))
+            if (Ft260Base.I2cDevices.Contains(0x3C))
             {
                 //BitmapImage.RegisterImageFactory(new MySsd1306ImageFactory());
                 //var x = BitmapImage.CreateBitmap(128, 64, PixelFormat.Format1bppBw);

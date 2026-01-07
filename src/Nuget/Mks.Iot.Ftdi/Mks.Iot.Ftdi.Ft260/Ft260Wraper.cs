@@ -330,13 +330,20 @@ namespace Mks.Iot.Ftdi.Ft260
             _log.TryLogInfo($"[{nameof(Ft260Wraper)}]({nameof(Ft260Wraper)}): Chip version: {GetChipVersion()}");
         }
 
+        public List<byte> I2cDevices = new List<byte>();
+
 
         /// <summary>
         ///     Welche I2C Geräte wurden am Bus gefunden
         /// </summary>
         /// <returns></returns>
-        public List<byte> GetI2cSlaves()
+        public List<byte> GetI2cDevices(bool forceUpdate = false)
         {
+            if (!forceUpdate && I2cDevices.Count > 0)
+            {
+                return I2cDevices;
+            }
+
             List<byte> r = new List<byte>();
 
             for (byte i = 8; i <= 128; i++)
@@ -356,10 +363,11 @@ namespace Mks.Iot.Ftdi.Ft260
                     s += "0x" + b.ToString("X2", CultureInfo.CurrentCulture) + " ";
                 }
 
-                _log.TryLogTrace($"[{nameof(Ft260Wraper)}]({nameof(GetI2cSlaves)}): {r.Count} slave(s) at {s}");
+                _log.TryLogTrace($"[{nameof(Ft260Wraper)}]({nameof(GetI2cDevices)}): {r.Count} slave(s) at {s}");
             }
 
-            return r;
+            I2cDevices = r;
+            return I2cDevices;
         }
 
         /// <summary>

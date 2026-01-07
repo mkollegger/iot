@@ -84,10 +84,7 @@ public class Ft260Gpio : GpioDriver
         if (disposing)
         {
             _ft260.Dispose();
-            _ioController?.Dispose();
             _ioController = null;
-
-            _instance?.Dispose();
             _instance = null;
         }
     }
