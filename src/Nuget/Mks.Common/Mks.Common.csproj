@@ -7,6 +7,12 @@
 
 	<!-- #region SDK Setting-->
 	<Import Project="..\..\mks.iot.projectinfos.proj" />
+	<ItemGroup>
+	  <None Include="..\nugetImage.png" Link="Ext\nugetImage.png">
+	    <PackagePath></PackagePath>
+	    <Pack>True</Pack>
+	  </None>
+	</ItemGroup>
 	<!-- #endregion SDK Setting-->
 
 	<ItemGroup>
@@ -16,6 +22,13 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Ext\Mks.Common.targets">
+	    <PackagePath>build\</PackagePath>
+	    <Pack>true</Pack>
+	  </None>
 	</ItemGroup>
 
 </Project>
