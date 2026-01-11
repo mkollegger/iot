@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+
+		<I2cController>Ft260</I2cController>
+		<I2cController>Pi</I2cController>
+
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>i2capp</RootNamespace>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+		<RuntimeIdentifier Condition="'$(I2cController)' == 'Pi'">linux-arm64</RuntimeIdentifier>
+		<BaseOutputPath Condition="'$(I2cController)' == 'Pi'">\\192.168.178.69\share\debug\i2capp\bin</BaseOutputPath>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>I2cController</_Parameter1>
+			<_Parameter2>$(I2cController)</_Parameter2>
+		</AssemblyAttribute>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Iot.Device.Bindings" Version="4.0.1" />
+		<PackageReference Include="System.Device.Gpio" Version="4.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Nuget\Mks.Iot.Ftdi\Mks.Iot.Ftdi.Ft260\Mks.Iot.Ftdi.Ft260.csproj" />
+	  <ProjectReference Include="..\..\Nuget\Mks.Iot.I2c\Mks.Iot.I2c.csproj" />
+	</ItemGroup>
+
+</Project>

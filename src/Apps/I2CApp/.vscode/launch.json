@@ -1,0 +1,32 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (PI@192.168.178.69)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "/home/mike/.dotnet/dotnet",
+            "args": [
+                "/home/mike/shared/debug/hellopi/bin/Debug/net10.0/linux-arm64/hellopi.dll",
+                "--debug"
+            ],
+            "cwd": "/home/mike/shared/debug/hellopi/bin/Debug/net10.0/linux-arm64/",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "ssh",
+                "pipeArgs": [
+                    "mike@192.168.178.69",
+                    "sudo"
+                ],
+                "debuggerPath": "/home/mike/.vs-debugger/vs2022/vsdbg"
+            }
+        }
+
+    ]
+}

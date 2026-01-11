@@ -80,7 +80,7 @@ public class CommandI2C : Command
             {
                 Console.WriteLine("Found SSD1306 display");
 
-                using I2cDevice i2CDevice = I2CDeviceFt260.Create(new I2cConnectionSettings(1, 0x3C));
+                using I2cDevice i2CDevice = I2cDeviceFt260.Create(new I2cConnectionSettings(1, 0x3C));
                 using MksSsd1306 device = new MksSsd1306(i2CDevice, EnumMksSsd1306LineModes.LineMode1);
 
                 device.ClearScreen();
@@ -91,7 +91,7 @@ public class CommandI2C : Command
 
             if (ft260.I2cDevices.Contains(0x20))
             {
-                var pcf8574 = new Pcf8574(I2CDeviceFt260.Create(new I2cConnectionSettings(1, 0x20)));
+                var pcf8574 = new Pcf8574(I2cDeviceFt260.Create(new I2cConnectionSettings(1, 0x20)));
                 pcf8574.WriteByte(0x33);
             }
         });

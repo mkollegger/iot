@@ -1,0 +1,27 @@
+//  DebugAdapterHost.Launch /LaunchJson:D:\Code\GitHub\mkollegger\iot\src\Apps\I2CApp\attach_vs202x.json
+{
+  "version": "0.2.0",
+  "adapter": "C:\\Windows\\System32\\OpenSSH\\ssh.exe",
+  "adapterArgs": "mike@192.168.178.69 -T sudo /home/mike/.vs-debugger/vs2022/vsdbg --interpreter=vscode",
+  "languageMappings": {
+    "C#": {
+      "languageId": "3F5162F8-07C6-11D3-9053-00C04FA302A1",
+      "extensions": [ "*" ]
+    }
+  },
+  "exceptionCategoryMappings": {
+    "CLR": "449EC4CC-30D2-4032-9256-EE18EB41B62B",
+    "MDA": "6ECE07A9-0EDE-45C4-8296-818D8FC401D4"
+  },
+  "configurations": [
+    {
+      "name": ".NET Core Launch",
+      "type": "coreclr",
+      "cwd": "/home/mike/shared/debug/i2capp/bin/Debug/net10.0/linux-arm64/",
+      "program": "/home/mike/.dotnet/dotnet",
+      "args": [ "/home/mike/shared/debug/i2capp/bin/Debug/net10.0/linux-arm64/I2CAapp.dll", "--debug" ],
+      "request": "launch",
+      "console": "internalTerminal"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Apps/">
     <Project Path="Apps/Ft260CliApp/Ft260CliApp.csproj" Id="df583c1f-42ee-468c-b934-7c8f26e62723" />
+    <Project Path="Apps/I2CApp/I2CAapp.csproj" />
   </Folder>
   <Folder Name="/Nuget/">
     <Project Path="Nuget/Mks.Common/Mks.Common.csproj" Id="719ebeaf-e647-4c3f-ac6c-e4eaea0c61ec" />

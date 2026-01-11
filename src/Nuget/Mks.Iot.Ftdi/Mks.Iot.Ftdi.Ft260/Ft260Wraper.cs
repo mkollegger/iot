@@ -1,6 +1,5 @@
 ﻿#region License
 
-// #region License
 // MIT License
 // 
 // Copyright (C) 2026 Michael Kollegger
@@ -22,7 +21,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-// #endregion
 
 #endregion
 
@@ -343,10 +341,15 @@ namespace Mks.Iot.Ftdi.Ft260
         /// <returns></returns>
         public List<byte> GetI2cDevices(bool forceUpdate = false)
         {
+            return I2cDevices;
+
+
             if (!forceUpdate && I2cDevices.Count > 0)
             {
                 return I2cDevices;
             }
+
+            I2CMaster_Reset();
 
             List<byte> r = new List<byte>();
 
@@ -400,7 +403,7 @@ namespace Mks.Iot.Ftdi.Ft260
             if (!noDebugLog)
             {
 #pragma warning disable CA1873
-                _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(CheckResult)}): Error result - {result}");
+                _log.TryLogError($"[{nameof(Ft260Wrapper)}]({nameof(CheckResult)}): Error result - {result}");
 #pragma warning restore CA1873
             }
 
@@ -679,28 +682,31 @@ namespace Mks.Iot.Ftdi.Ft260
         public Ft260I2cControllerStatus I2CMaster_GetStatus(bool noDebugLog = false, bool scan = false)
         {
             Check();
-            byte status = 0;
-            if (CheckResult(FT260_I2CMaster_GetStatus(_ft260Handle, out status)))
-            {
-                Ft260I2cControllerStatus s = (Ft260I2cControllerStatus) status;
-                if (!scan)
-                {
-                    if (s != Ft260I2cControllerStatus.Idle)
-                    {
-                        int i = 0;
-                        do
-                        {
-                            Thread.Sleep(50);
-                            CheckResult(FT260_I2CMaster_GetStatus(_ft260Handle, out status));
-                            s = (Ft260I2cControllerStatus) status;
-                            if (s == Ft260I2cControllerStatus.Idle)
-                            {
-                                break;
-                            }
+            byte status;
+            var statusCheck = CheckResult(FT260_I2CMaster_GetStatus(_ft260Handle, out status));
+            var s = (Ft260I2cControllerStatus)status;
+            if (s == Ft260I2cControllerStatus.Idle)
+                return (Ft260I2cControllerStatus)status;
 
-                            i++;
-                        } while (i < 10);
-                    }
+            if (statusCheck)
+            {
+                if (!scan && !s.HasFlag(Ft260I2cControllerStatus.Idle))
+                {
+                    int i = 0;
+                    do
+                    {
+                        Thread.Sleep(50);
+                        I2CMaster_Reset();
+                       
+                        CheckResult(FT260_I2CMaster_GetStatus(_ft260Handle, out status));
+                        s = (Ft260I2cControllerStatus)status;
+                        if (s == Ft260I2cControllerStatus.Idle)
+                        {
+                            break;
+                        }
+
+                        i++;
+                    } while (i < 10);
                 }
 
                 if (noDebugLog)
@@ -712,28 +718,28 @@ namespace Mks.Iot.Ftdi.Ft260
                 {
                     if (s.HasFlag(Ft260I2cControllerStatus.Busy))
                     {
-                        _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Controller busy");
+                        _log.TryLogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Controller busy");
                     }
                     else
                     {
                         if (s.HasFlag(Ft260I2cControllerStatus.Error))
                         {
-                            _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Error condition");
+                            _log.TryLogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Error condition");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.AddressNack))
                         {
-                            _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Slave address was not acknowledged during last operation");
+                            _log.TryLogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Slave address was not acknowledged during last operation");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.DataNack))
                         {
-                            _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Data not acknowledged during last operation");
+                            _log.TryLogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Data not acknowledged during last operation");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.ArbitrationLost))
                         {
-                            _log.LogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Arbitration lost during last operation");
+                            _log.TryLogError($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Arbitration lost during last operation");
                         }
 
                         if (s.HasFlag(Ft260I2cControllerStatus.Idle))
@@ -743,7 +749,7 @@ namespace Mks.Iot.Ftdi.Ft260
 
                         if (s.HasFlag(Ft260I2cControllerStatus.BusBusy))
                         {
-                            _log.LogWarning($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Bus busy");
+                            _log.TryLogWarning($"[{nameof(Ft260Wrapper)}]({nameof(I2CMaster_GetStatus)}): Bus busy");
                         }
                     }
                 }
@@ -768,7 +774,7 @@ namespace Mks.Iot.Ftdi.Ft260
         /// <param name="noDebugLog">No debug output</param>
         /// <param name="scan">"quick" scan for slaves</param>
         /// <returns></returns>
-        public (List<byte>? data, Ft260I2cControllerStatus status) I2CMaster_Read(byte deviceAddress, FT260_I2C_FLAG flag, uint bytesToRead, ulong wait_timer = 5000, bool noDebugLog = false, bool scan = false)
+        public (List<byte>? data, Ft260I2cControllerStatus status) I2CMaster_Read(byte deviceAddress, FT260_I2C_FLAG flag, uint bytesToRead, ulong wait_timer = 500, bool noDebugLog = false, bool scan = false)
         {
             Check();
 
@@ -818,16 +824,11 @@ namespace Mks.Iot.Ftdi.Ft260
             }
 
             Check();
-
             Ft260I2cControllerStatus status = I2CMaster_GetStatus(true);
-            if (status != Ft260I2cControllerStatus.Idle)
+            if (!status.HasFlag(Ft260I2cControllerStatus.Idle))
             {
                 I2CMaster_Reset();
             }
-            //if (status.HasFlag(Ft260I2cControllerStatus.Error))
-            //{
-            //    I2CMaster_Reset();
-            //}
 
             byte[] buffer = data.ToArray();
             uint bytesToWrite = (uint) data.Count;
@@ -836,8 +837,8 @@ namespace Mks.Iot.Ftdi.Ft260
             IntPtr pntr = Marshal.AllocHGlobal(size);
 
             Marshal.Copy(buffer, 0, pntr, (int) bytesToWrite);
-
-            if (CheckResult(FT260_I2CMaster_Write(_ft260Handle, deviceAddress, flag, pntr, bytesToWrite, out bytesWritten)))
+            var check = CheckResult(FT260_I2CMaster_Write(_ft260Handle, deviceAddress, flag, pntr, bytesToWrite, out bytesWritten));
+            if (check)
             {
                 status = I2CMaster_GetStatus();
                 Marshal.FreeHGlobal(pntr);
