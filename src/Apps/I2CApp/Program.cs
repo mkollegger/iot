@@ -41,6 +41,7 @@ using System.Drawing;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Mks.Common.Ext;
+using Mks.Iot.I2c.Devices.Pca9538;
 
 namespace hellopi
 {
@@ -126,13 +127,23 @@ namespace hellopi
                         Console.WriteLine($"Set Byte to {b:X2}");
 
                         //var pca9538 = new Pca8574(create(new I2cConnectionSettings(1, 0x70)));
-                        var pca9538 = create(new I2cConnectionSettings(1, 0x70));
+                        //var pca9538 = create(new I2cConnectionSettings(1, 0x70));
+                        var pca9538 = new MksPca9538(create(new I2cConnectionSettings(1, 0x70)));
+                        //pca9538.Write([3,0]);
+                        //pca9538.Write([1, b]);
 
-                        pca9538.Write([3,0]);
-                        pca9538.Write([1, b]);
-                        
+                        pca9538.EnablePolling(100);
+
+                        var gpio = pca9538.GetGpioController();
+                        var pin = gpio.OpenPin(0);
+                        pin.Toggle();
 
                         b = (byte)((b == 0) ? 0xff : 0x00);
+
+
+
+
+
                     }
                     
                     await Task.Delay(500).ConfigureAwait(true);
