@@ -28,10 +28,15 @@ using Iot.Device.Graphics;
 using Iot.Device.Graphics.SkiaSharpAdapter;
 using Iot.Device.Lm75;
 using Iot.Device.Pcx857x;
+using Iot.Device.Pwm;
+using Iot.Device.ServoMotor;
 using Iot.Device.Ssd13xx.Commands.Ssd1306Commands;
+using Microsoft.Extensions.Logging;
+using Mks.Common.Ext;
 using Mks.Iot.Ftdi.Ft260;
 using Mks.Iot.I2c;
 using Mks.Iot.I2c.Devices;
+using Mks.Iot.I2c.Devices.Pca9538;
 using SkiaSharp;
 using System.Device.Gpio;
 using System.Device.Gpio.Drivers;
@@ -39,9 +44,8 @@ using System.Device.I2c;
 using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
-using Microsoft.Extensions.Logging;
-using Mks.Common.Ext;
-using Mks.Iot.I2c.Devices.Pca9538;
+using System.Reflection.Metadata;
+using UnitsNet;
 
 namespace hellopi
 {
@@ -84,7 +88,17 @@ namespace hellopi
             var dbg = args.Any(a => a.Equals("--debug", StringComparison.OrdinalIgnoreCase));
             Console.WriteLine("Hello, World@Pi with C#!");
 
-            if (!dbg)
+            var p = new MksPca9538(create(new I2cConnectionSettings(1, 0x70)));
+            //await p.StartTest().ConfigureAwait(true);
+
+
+
+
+
+            p.Configuration = 0x00; // Alle Pins als Ausgang
+            p.OutputPort = 0x33;
+
+            if (dbg)
             {
                 Console.WriteLine("Starte ohne Debugger.");
 
@@ -93,6 +107,58 @@ namespace hellopi
 
                 byte b = 0;
                 int counter = 0;
+
+                if (adr.Contains(0x40))
+                {
+                    // Servo Test
+                    var pca9685 = new Pca9685(create(new I2cConnectionSettings(1, 0x40)));
+                    using var m = new ServoMotor(pca9685.CreatePwmChannel(0));
+                    
+                    m.Calibrate(180, 544,2400);
+
+                    ////Winkel durchlaufen als Test mit einer Servomotorsteuerung
+                    //for (int angle = 0; angle <= 180; angle += 1)
+                    //{
+                    //    Console.WriteLine($"Set servo to {angle} degrees.");
+                    //    m.WriteAngle(angle);
+                    //    await Task.Delay(5).ConfigureAwait(true);
+                    //}
+
+                    //for (int angle = 180; angle > 0; angle -= 1)
+                    //{
+                    //    Console.WriteLine($"Set servo to {angle} degrees.");
+                    //    m.WriteAngle(angle);
+                    //    await Task.Delay(5).ConfigureAwait(true);
+                    //}
+
+
+
+                    int i = 0;
+                    do
+                    {
+                        //m.WriteAngle(180);
+                        //await Task.Delay(1000).ConfigureAwait(true);
+
+                        m.WriteAngle(90);
+                        await Task.Delay(250).ConfigureAwait(true);
+
+                        m.WriteAngle(45);
+                        await Task.Delay(250).ConfigureAwait(true);
+
+                        if (i++ > 100)
+                            break;
+
+                    } while (true);
+
+
+                    m.WriteAngle(90);
+                    await Task.Delay(100).ConfigureAwait(true);
+
+                    Debugger.Break();
+
+                }
+
+
 
                 if (adr.Contains(0x3C))
                 {
@@ -198,6 +264,7 @@ namespace hellopi
 
             Console.WriteLine("Programm beendet.");
         }
+
 
         /// <summary>
         ///     Steuert das Blinken einer LED an einem GPIO-Pin und der Onboard-ACT-LED.

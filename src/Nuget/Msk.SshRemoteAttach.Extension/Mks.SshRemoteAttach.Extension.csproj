@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!--
+      net472 is required for in-process VS 2022 extensions.
+      Even with the new VisualStudio.Extensibility SDK, in-proc extensions targeting
+      VS 2022 must use .NET Framework 4.7.2 because devenv.exe runs on .NET Framework.
+      Reference: https://learn.microsoft.com/en-us/visualstudio/extensibility/visualstudio.extensibility/get-started/in-proc-extensions
+      All official Microsoft samples (CompositeExtension, CommentRemover) confirm this.
+    -->
+    <TargetFramework>net472</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>12</LangVersion>
+
+    <!-- Required by VisualStudio.Extensibility for VSSDK compatibility mode -->
+    <VssdkCompatibleExtension>true</VssdkCompatibleExtension>
+
+    <!-- Suppress CA1812 (uninstantiated internal class) — DI creates these -->
+    <NoWarn>$(NoWarn);CA1812</NoWarn>
+
+    <!-- Launch VS Experimental Instance when F5 is pressed on this project -->
+    <StartAction>Program</StartAction>
+    <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
+    <StartArguments>/rootsuffix Exp</StartArguments>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      VisualStudio.Extensibility SDK — the new framework for VS extensions.
+      Version 17.14.40608 confirmed from NuGet (released 2025-10-02).
+      Source: https://www.nuget.org/packages/Microsoft.VisualStudio.Extensibility.Sdk
+    -->
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40608" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.14.40608" PrivateAssets="all" />
+
+    <!--
+      VS SDK reference assemblies for DTE, IVsHierarchy, etc.
+      Version aligned with the CommentRemover and CompositeExtension official samples.
+      Source: https://github.com/microsoft/VSExtensibility/tree/main/New_Extensibility_Model/Samples
+    -->
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" ExcludeAssets="runtime" />
+
+    <!-- System.Text.Json for parsing launchSettings.json (netstandard2.0 compatible).
+         Must stay on 9.x: System.Text.Json 10.0+ dropped its netstandard2.0 target,
+         so no DLL is deployed into the VSIX for net472, causing a load failure at
+         runtime. 9.x still ships netstandard2.0 and satisfies the >= 9.0.0 transitive
+         requirement from Microsoft.VisualStudio.SDK, avoiding NU1605 as well. -->
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>

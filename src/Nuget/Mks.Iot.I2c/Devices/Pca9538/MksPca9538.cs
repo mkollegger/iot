@@ -1,7 +1,9 @@
 using System;
 using System.Device.Gpio;
 using System.Device.I2c;
+using System.Net.Http.Headers;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mks.Iot.I2c.Devices.Pca9538;
 
@@ -9,7 +11,7 @@ namespace Mks.Iot.I2c.Devices.Pca9538;
 /// MksPca9538 8-bit I/O Expander.
 /// Provides GPIO expansion via I2C bus.
 /// </summary>
-public class MksPca9538 : I2cDevice
+public class MksPca9538 : I2cDevice, IMksI2cDevice
 {
     private readonly I2cDevice _i2cDevice;
     private MksPca9538GpioDriver? _driver;
@@ -232,5 +234,50 @@ public class MksPca9538 : I2cDevice
          {
              // Ignore errors during checking (e.g. I2C bus error)
          }
+    }
+
+    /// <inheritdoc />
+    public async Task StartTest(CancellationToken cancellationToken = default)
+    {
+        Console.WriteLine("Starting test for MksPca9538...");
+        Configuration = 0x00; // Set all pins as outputs
+        
+        OutputPort = 0xFF; // Set all outputs high
+        Console.WriteLine("All pins set to output and high for 2 seconds.");
+        await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
+        
+        OutputPort = 0x00; // Set all outputs low
+        Console.WriteLine("All pins set to low for 2 seconds.");
+        await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
+        OutputPort = 0xFF; // Set all outputs high
+
+        Console.WriteLine("Toggle pin 4 for 10 times");
+        var pin4 = GetGpioController().OpenPin(4, PinMode.Output);
+        for (int i = 0; i < 10; i++)
+        {
+            pin4.Toggle();
+            await Task.Delay(250, cancellationToken).ConfigureAwait(false);
+        }
+        pin4.Write(PinValue.High);
+
+        Console.WriteLine("Press pin 4 now ...");
+
+        //Signal that we want to test input change detection on pin 4. The user can connect pin 4 to GND to trigger the event.
+        var tcs = new TaskCompletionSource();
+
+        EnablePolling(100);
+        pin4.SetPinMode(PinMode.Input);
+        pin4.ValueChanged += (s, e) =>
+        {
+            Console.WriteLine($"Pin 4 changed: {e.ChangeType}");
+            pin4.SetPinMode(PinMode.Output);
+            pin4.Write(PinValue.Low);
+            tcs.TrySetResult();
+        };
+        await using (cancellationToken.Register(() => tcs.TrySetCanceled())) ;
+        await tcs.Task.ConfigureAwait(false);
+
+
+        Console.WriteLine("Test completed.");
     }
 }
