@@ -6,8 +6,8 @@
   <Folder Name="/Nuget/">
     <Project Path="Nuget/Mks.Common/Mks.Common.csproj" Id="719ebeaf-e647-4c3f-ac6c-e4eaea0c61ec" />
     <Project Path="Nuget/Mks.Iot.I2c/Mks.Iot.I2c.csproj" />
-    <Project Path="Z:/Code/GitHub/mkollegger/iot/src/Nuget/Msk.SshRemoteAttach.Extension/Mks.SshRemoteAttach.Extension.csproj">
-      <Deploy Solution="Debug|*" />
+    <Project Path="Nuget/Mks.SshRemoteAttach.Extension/Mks.SshRemoteAttach.Extension.csproj">
+      <Deploy />
     </Project>
   </Folder>
   <Folder Name="/Nuget/Mks.Iot.Ftdi/">

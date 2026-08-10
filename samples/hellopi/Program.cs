@@ -77,7 +77,7 @@ namespace hellopi
 
             if (Debugger.IsAttached)
             {
-                Console.WriteLine("Debugger angehängt. Fortfahren...");
+                Console.WriteLine("Debugger angehängt.");
                 Debugger.Break();
             }
 

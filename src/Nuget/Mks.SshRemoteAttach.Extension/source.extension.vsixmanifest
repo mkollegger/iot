@@ -7,10 +7,7 @@
 -->
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
   <Metadata>
-    <Identity Id="SshRemoteAttach.Extension.Kollegger.BISS"
-              Version="0.2.0"
-              Language="en-US"
-              Publisher="Michael Kollegger (BISS)" />
+    <Identity Id="Mks.SshRemoteAttach.Extension" Version="0.3.0" Language="en-US" Publisher="Michael Kollegger" />
     <DisplayName>SSH Remote Attach</DisplayName>
     <Description xml:space="preserve">Adds an "Start SSH Remote Debug" command to Visual Studio.
 Reads SshRemoteAttach profiles from launchSettings.json, optionally deploys the build output
@@ -18,20 +15,26 @@ to an SMB share, and starts vsdbg on the remote host over SSH.</Description>
     <Tags>ssh;remote;debug;raspberry pi;linux;dotnet</Tags>
   </Metadata>
   <Installation ExtensionType="VSSDK+VisualStudio.Extensibility">
-    <InstallationTarget Id="Microsoft.VisualStudio.Community"    Version="[17.9,18.0)">
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[18.0,)">
       <ProductArchitecture>amd64</ProductArchitecture>
     </InstallationTarget>
-    <InstallationTarget Id="Microsoft.VisualStudio.Community"    Version="[17.9,18.0)">
+    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[18.0,)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[18.0,)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[18.0,)">
       <ProductArchitecture>arm64</ProductArchitecture>
     </InstallationTarget>
-    <InstallationTarget Id="Microsoft.VisualStudio.Professional" Version="[17.9,18.0)">
-      <ProductArchitecture>amd64</ProductArchitecture>
+    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[18.0,)">
+      <ProductArchitecture>arm64</ProductArchitecture>
     </InstallationTarget>
-    <InstallationTarget Id="Microsoft.VisualStudio.Enterprise"   Version="[17.9,18.0)">
-      <ProductArchitecture>amd64</ProductArchitecture>
+    <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[18.0,)">
+      <ProductArchitecture>arm64</ProductArchitecture>
     </InstallationTarget>
   </Installation>
   <Prerequisites>
-    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.9,)" DisplayName="Visual Studio core editor" />
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" DisplayName="Visual Studio core editor" Version="[17.9,)" />
   </Prerequisites>
 </PackageManifest>

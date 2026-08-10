@@ -1,7 +1,30 @@
+// #region License
+// MIT License
+// 
+// Copyright (C) 2026 Michael Kollegger
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// #endregion
+
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using EnvDTE;
@@ -11,50 +34,58 @@ using Microsoft.VisualStudio.Extensibility.Commands;
 using Microsoft.VisualStudio.Extensibility.Shell;
 using Microsoft.VisualStudio.Extensibility.VSSdkCompatibility;
 using Microsoft.VisualStudio.Shell;
-using SshRemoteAttach.Core;
-using SshRemoteAttach.Deployment;
+using Mks.SshRemoteAttach.Extension.Core;
+using Mks.SshRemoteAttach.Extension.Deployment;
+using Command = Microsoft.VisualStudio.Extensibility.Commands.Command;
 using Process = System.Diagnostics.Process;
 
-namespace SshRemoteAttach.Commands;
+namespace Mks.SshRemoteAttach.Extension.Commands;
 
 /// <summary>
-/// Menu command that reads <c>launchSettings.json</c>, optionally deploys the build output,
-/// and starts a remote debug session via <c>DebugAdapterHost.Launch</c>.
+///     Menu command that reads <c>launchSettings.json</c>, optionally deploys the build output,
+///     and starts a remote debug session via <c>DebugAdapterHost.Launch</c>.
 /// </summary>
 /// <remarks>
-/// Mirrors the manual workflow:
-/// <code>
+///     Mirrors the manual workflow:
+///     <code>
 /// DebugAdapterHost.Launch /LaunchJson:attach_vs202x.json
 /// </code>
 /// </remarks>
 [VisualStudioContribution]
-internal sealed class StartSshRemoteDebugCommand : Microsoft.VisualStudio.Extensibility.Commands.Command
+internal sealed class StartSshRemoteDebugCommand : Command
 {
+    private readonly IDeploymentService _deployment;
     private readonly AsyncServiceProviderInjection<DTE, DTE2> _dteInjection;
     private readonly LaunchSettingsReader _reader;
-    private readonly IDeploymentService _deployment;
+    private readonly SelectedProfileService _selected;
 
     public StartSshRemoteDebugCommand(
         VisualStudioExtensibility extensibility,
         AsyncServiceProviderInjection<DTE, DTE2> dteInjection,
         LaunchSettingsReader reader,
-        IDeploymentService deployment)
+        IDeploymentService deployment,
+        SelectedProfileService selected)
         : base(extensibility)
     {
-        _dteInjection  = dteInjection ?? throw new ArgumentNullException(nameof(dteInjection));
-        _reader        = reader       ?? throw new ArgumentNullException(nameof(reader));
-        _deployment    = deployment   ?? throw new ArgumentNullException(nameof(deployment));
+        _dteInjection = dteInjection ?? throw new ArgumentNullException(nameof(dteInjection));
+        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        _deployment = deployment ?? throw new ArgumentNullException(nameof(deployment));
+        _selected = selected ?? throw new ArgumentNullException(nameof(selected));
     }
 
-    /// <inheritdoc/>
+    #region Properties
+
+    /// <inheritdoc />
     public override CommandConfiguration CommandConfiguration => new("Start SSH Remote Debug")
     {
         Placements = [CommandPlacement.KnownPlacements.ExtensionsMenu],
         EnabledWhen = ActivationConstraint.SolutionState(SolutionState.Exists),
-        
+        Icon = new(ImageMoniker.KnownValues.Run, IconSettings.IconAndText),
     };
 
-    /// <inheritdoc/>
+    #endregion
+
+    /// <inheritdoc />
     public override async Task ExecuteCommandAsync(IClientContext context, CancellationToken cancellationToken)
     {
         // ── 1. Acquire DTE and switch to the UI thread ───────────────────────
@@ -66,8 +97,10 @@ internal sealed class StartSshRemoteDebugCommand : Microsoft.VisualStudio.Extens
         string outputDir;
         try
         {
+            var startupProject = FindStartupProject(dte);
             launchSettingsPath = FindLaunchSettingsPath(dte);
-            outputDir          = ResolveOutputDirectory(dte);
+            outputDir = ResolveOutputDirectory(dte);
+            BuildStartupProject(dte, startupProject.UniqueName);
         }
         catch (LaunchException ex)
         {
@@ -76,14 +109,12 @@ internal sealed class StartSshRemoteDebugCommand : Microsoft.VisualStudio.Extens
         }
 
         // ── 3. Read profiles and deploy (thread pool) ────────────────────────
-        IReadOnlyList<SshRemoteAttachProfile> profiles;
-        SshRemoteAttachProfile profile;
         string tempPath;
 
         try
         {
-            profiles = _reader.ReadProfiles(launchSettingsPath);
-                                                                                
+            var profiles = _reader.ReadProfiles(launchSettingsPath);
+
             if (profiles.Count == 0)
             {
                 await ShowErrorAsync(
@@ -93,10 +124,10 @@ internal sealed class StartSshRemoteDebugCommand : Microsoft.VisualStudio.Extens
                 return;
             }
 
-            profile = profiles[0];
+            var profile = _selected.ResolveSelected(profiles);
 
             await _deployment.DeployAsync(profile, outputDir, cancellationToken)
-                             .ConfigureAwait(false);
+                .ConfigureAwait(false);
 
             var json = AttachJsonBuilder.Build(profile);
             tempPath = WriteTempJson(json, profile.SshHost);
@@ -112,7 +143,6 @@ internal sealed class StartSshRemoteDebugCommand : Microsoft.VisualStudio.Extens
 
         try
         {
-
             dte.ExecuteCommand("DebugAdapterHost.Launch", $"/LaunchJson:\"{tempPath}\"");
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -149,7 +179,7 @@ internal sealed class StartSshRemoteDebugCommand : Microsoft.VisualStudio.Extens
         try
         {
             var startupProject = FindStartupProject(dte);
-            var projectDir     = Path.GetDirectoryName(startupProject.FullName) ?? string.Empty;
+            var projectDir = Path.GetDirectoryName(startupProject.FullName) ?? string.Empty;
 
             var outputPath = startupProject
                 .ConfigurationManager
@@ -175,8 +205,10 @@ internal sealed class StartSshRemoteDebugCommand : Microsoft.VisualStudio.Extens
         ThreadHelper.ThrowIfNotOnUIThread();
 
         if (dte.Solution?.SolutionBuild?.StartupProjects is not object[] startups || startups.Length == 0)
+        {
             throw new LaunchException(
                 "No startup project is set. Right-click a project and choose 'Set as Startup Project'.");
+        }
 
         var startupName = startups[0] as string
             ?? throw new LaunchException("Could not determine the startup project name.");
@@ -186,11 +218,34 @@ internal sealed class StartSshRemoteDebugCommand : Microsoft.VisualStudio.Extens
         {
             var found = FindInProject(p, startupName);
             if (found != null)
+            {
                 return found;
+            }
         }
 
         throw new LaunchException(
             $"Startup project '{startupName}' was not found in the solution.");
+    }
+
+    private static void BuildStartupProject(DTE2 dte, string startupProjectUniqueName)
+    {
+        ThreadHelper.ThrowIfNotOnUIThread();
+
+        var solutionBuild = dte.Solution?.SolutionBuild
+            ?? throw new LaunchException("Could not access solution build services.");
+
+        var activeConfigurationName = solutionBuild.ActiveConfiguration?.Name;
+        if (string.IsNullOrWhiteSpace(activeConfigurationName))
+        {
+            throw new LaunchException("Could not determine the active solution configuration.");
+        }
+
+        solutionBuild.BuildProject(activeConfigurationName, startupProjectUniqueName, true);
+
+        if (solutionBuild.LastBuildInfo != 0)
+        {
+            throw new LaunchException("Build failed. Fix build errors and try again.");
+        }
     }
 
     private static Project? FindInProject(Project project, string uniqueName)
@@ -202,16 +257,24 @@ internal sealed class StartSshRemoteDebugCommand : Microsoft.VisualStudio.Extens
         {
             foreach (ProjectItem item in project.ProjectItems)
             {
-                if (item.SubProject == null) continue;
+                if (item.SubProject == null)
+                {
+                    continue;
+                }
+
                 var found = FindInProject(item.SubProject, uniqueName);
-                if (found != null) return found;
+                if (found != null)
+                {
+                    return found;
+                }
             }
+
             return null;
         }
 
         return string.Equals(project.UniqueName, uniqueName, StringComparison.OrdinalIgnoreCase)
-               ? project
-               : null;
+            ? project
+            : null;
     }
 
     // ── Static helpers ───────────────────────────────────────────────────────
@@ -220,20 +283,31 @@ internal sealed class StartSshRemoteDebugCommand : Microsoft.VisualStudio.Extens
     {
         var name = $"ssh_remote_attach_{SanitizeFileName(sshHost.Replace('.', '_'))}_{Process.GetCurrentProcess().Id}.json";
         var path = Path.Combine(Path.GetTempPath(), name);
-        File.WriteAllText(path, json, System.Text.Encoding.UTF8);
+        File.WriteAllText(path, json, Encoding.UTF8);
         return path;
     }
 
     private static void TryDelete(string path)
     {
-        try { if (File.Exists(path)) File.Delete(path); }
-        catch (IOException) { }
+        try
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+        catch (IOException)
+        {
+        }
     }
 
     private static string SanitizeFileName(string name)
     {
         foreach (var c in Path.GetInvalidFileNameChars())
+        {
             name = name.Replace(c, '_');
+        }
+
         return name;
     }
 
