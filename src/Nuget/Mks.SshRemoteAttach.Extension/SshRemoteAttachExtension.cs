@@ -22,8 +22,10 @@
 // SOFTWARE.
 // #endregion
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.ServiceHub.Framework;
 using Microsoft.VisualStudio.Extensibility;
 using Mks.SshRemoteAttach.Extension.Core;
 using Mks.SshRemoteAttach.Extension.Services;
@@ -65,7 +67,22 @@ internal sealed class SshRemoteAttachExtension : Microsoft.VisualStudio.Extensib
         services.AddSingleton<SelectedProfileService>();
         services.AddSingleton<LaunchSettingsReader>();
         services.AddSingleton<IDeploymentService, ShareDeploymentService>();
-        
     }
 
+    protected override async Task OnInitializedAsync(VisualStudioExtensibility extensibility, CancellationToken cancellationToken)
+    {
+        await base.OnInitializedAsync(extensibility, cancellationToken);
+
+        try
+        {
+            if (ServiceProvider.GetService(typeof(SelectedProfileService)) is SelectedProfileService selected)
+            {
+                await selected.EnsureLoadedAsync(extensibility, cancellationToken).ConfigureAwait(false);
+            }
+        }
+        catch
+        {
+            // Ignore restore errors; fallback profile selection still works.
+        }
+    }
 }

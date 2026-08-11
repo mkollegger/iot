@@ -9,12 +9,8 @@
 
 		<!--<RuntimeIdentifier>linux-arm64</RuntimeIdentifier>-->
 
-		<RuntimeIdentifier>osx-arm64</RuntimeIdentifier>
-
+		<RuntimeIdentifiers>osx-arm64;win-x64;linux-arm64;win-arm64</RuntimeIdentifiers>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		
-		
-		<!--<BaseOutputPath>\\192.168.178.69\share\debug\hellopi\bin</BaseOutputPath>-->
 		
 	</PropertyGroup>
 

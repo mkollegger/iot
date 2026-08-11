@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "hellopi": {
+    "Windows": {
       "commandName": "Project",
       "remoteDebugEnabled": false
     },
