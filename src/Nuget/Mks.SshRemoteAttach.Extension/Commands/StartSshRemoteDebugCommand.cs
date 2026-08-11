@@ -74,6 +74,7 @@ internal sealed class StartSshRemoteDebugCommand : Command
 
         _selected.Changed += (_, _) => DisplayName = _selected.SelectedProfileName;
         DisplayName = _selected.SelectedProfileName;
+        _ = InitializeSelectedProfileAsync(extensibility);
     }
 
     #region Properties
@@ -91,6 +92,8 @@ internal sealed class StartSshRemoteDebugCommand : Command
     /// <inheritdoc />
     public override async Task ExecuteCommandAsync(IClientContext context, CancellationToken cancellationToken)
     {
+        await _selected.EnsureLoadedAsync(Extensibility, cancellationToken).ConfigureAwait(false);
+
         // ── 1. Acquire DTE and switch to the UI thread ───────────────────────
         var dte = await _dteInjection.GetServiceAsync();
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
@@ -128,6 +131,7 @@ internal sealed class StartSshRemoteDebugCommand : Command
             }
 
             var profile = _selected.ResolveSelected(profiles);
+            await _selected.PersistAsync(Extensibility, cancellationToken).ConfigureAwait(false);
 
             await _deployment.DeployAsync(profile, outputDir, cancellationToken)
                 .ConfigureAwait(false);
@@ -155,6 +159,18 @@ internal sealed class StartSshRemoteDebugCommand : Command
         finally
         {
             TryDelete(tempPath);
+        }
+    }
+
+    private async Task InitializeSelectedProfileAsync(VisualStudioExtensibility extensibility)
+    {
+        try
+        {
+            await _selected.EnsureLoadedAsync(extensibility, CancellationToken.None).ConfigureAwait(false);
+        }
+        catch
+        {
+            // Ignore restore errors; fallback profile selection still works.
         }
     }
 

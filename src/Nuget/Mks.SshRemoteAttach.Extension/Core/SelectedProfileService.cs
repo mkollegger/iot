@@ -22,14 +22,21 @@
 // SOFTWARE.
 // #endregion
 
+using Microsoft.VisualStudio.Extensibility;
 using Mks.SshRemoteAttach.Extension.Commands;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mks.SshRemoteAttach.Extension.Core;
 
 internal sealed class SelectedProfileService
 {
+    private const string PersistedProfileMoniker = "Mks.SshRemoteAttach.SelectedProfileName";
+
+    private readonly SemaphoreSlim _loadGate = new(1, 1);
+    private bool _isLoaded;
     private string? _selectedProfileName;
 
     #region Properties
@@ -53,6 +60,44 @@ internal sealed class SelectedProfileService
     #endregion
 
     public event EventHandler? Changed;
+
+    public async Task EnsureLoadedAsync(VisualStudioExtensibility extensibility, CancellationToken cancellationToken)
+    {
+        if (_isLoaded)
+        {
+            return;
+        }
+
+        await _loadGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            if (_isLoaded)
+            {
+                return;
+            }
+
+            var persisted = await extensibility.Configuration()
+                .GetPersistedStateAsync<string>(PersistedProfileMoniker, null, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (!string.IsNullOrWhiteSpace(persisted))
+            {
+                SelectedProfileName = persisted;
+            }
+
+            _isLoaded = true;
+        }
+        finally
+        {
+            _loadGate.Release();
+        }
+    }
+
+    public Task PersistAsync(VisualStudioExtensibility extensibility, CancellationToken cancellationToken)
+    {
+        return extensibility.Configuration()
+            .WritePersistedStateAsync(PersistedProfileMoniker, _selectedProfileName ?? string.Empty, cancellationToken);
+    }
 
     public SshRemoteAttachProfile ResolveSelected(IReadOnlyList<SshRemoteAttachProfile> profiles)
     {

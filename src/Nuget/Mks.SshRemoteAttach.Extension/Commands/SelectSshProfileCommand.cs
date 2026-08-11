@@ -71,6 +71,8 @@ internal sealed class SelectSshProfileCommand : Command
 
     public override async Task ExecuteCommandAsync(IClientContext context, CancellationToken cancellationToken)
     {
+        await _selected.EnsureLoadedAsync(Extensibility, cancellationToken).ConfigureAwait(false);
+
         var dte = await _dteInjection.GetServiceAsync();
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
@@ -98,6 +100,7 @@ internal sealed class SelectSshProfileCommand : Command
         if (profiles.Count == 1)
         {
             _selected.SelectedProfileName = profiles[0].ProfileName;
+            await _selected.PersistAsync(Extensibility, cancellationToken).ConfigureAwait(false);
             return;
         }
 
@@ -127,6 +130,7 @@ internal sealed class SelectSshProfileCommand : Command
         if (selectedIndex >= 0 && selectedIndex < profiles.Count)
         {
             _selected.SelectedProfileName = profiles[selectedIndex].ProfileName;
+            await _selected.PersistAsync(Extensibility, cancellationToken).ConfigureAwait(false);
         }
     }
 
