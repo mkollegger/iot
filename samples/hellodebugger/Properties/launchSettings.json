@@ -1,0 +1,43 @@
+{
+  "profiles": {
+    "hellopi": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "Remote Pi": {
+      "commandName": "SshRemoteAttach",
+      "sshHost": "192.168.178.69",
+      "sshUser": "mike",
+      "sshIdentityFile": null,
+      "sshExecutable": "C:\\Windows\\System32\\OpenSSH\\ssh.exe",
+      "useSudo": true,
+      "remoteVsDbgPath": "/home/mike/.vs-debugger/vs2022/vsdbg",
+      "remoteDotnetPath": "/home/mike/.dotnet/dotnet",
+      "remoteWorkingDirectory": "/home/mike/shared/debug/hellopi/bin/Debug/net10.0/linux-arm64",
+      "remoteAppDll": "hellopi.dll",
+      "remoteAppArgs": "--debug",
+      "deployLocalShare": "\\\\192.168.178.69\\share\\debug\\hellopi",
+      "deployFromOutputDir": true,
+      "deployBeforeLaunch": true
+    },
+    "Remote MAC": {
+      "commandName": "SshRemoteAttach",
+      "sshHost": "mbpmike",
+      "sshUser": "mike",
+      "sshIdentityFile": null,
+      "sshExecutable": "C:\\Windows\\System32\\OpenSSH\\ssh.exe",
+      "useSudo": false,
+      "remoteVsDbgPath": "/Users/mike/.vs-debugger/arm64/vs2022/vsdbg",
+      "remoteDotnetPath": "/usr/local/share/dotnet/dotnet",
+      "remoteWorkingDirectory": "/Users/mike/Code/GitHub/mkollegger/iot/samples/hellodebugger/bin/Debug/net10.0/osx-arm64",
+      "remoteAppDll": "hellodebugger.dll",
+      "remoteAppArgs": "--debug",
+      "deployLocalShare": "",
+      "deployBeforeLaunch": false
+    }
+  }
+}

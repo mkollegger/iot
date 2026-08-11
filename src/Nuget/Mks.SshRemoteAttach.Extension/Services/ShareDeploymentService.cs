@@ -28,7 +28,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mks.SshRemoteAttach.Extension.Core;
 
-namespace Mks.SshRemoteAttach.Extension.Deployment;
+namespace Mks.SshRemoteAttach.Extension.Services;
 
 /// <summary>
 ///     Copies the MSBuild output directory to a local SMB mount that mirrors the remote working directory.

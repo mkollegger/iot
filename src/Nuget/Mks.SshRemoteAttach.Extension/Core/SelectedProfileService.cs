@@ -22,6 +22,7 @@
 // SOFTWARE.
 // #endregion
 
+using Mks.SshRemoteAttach.Extension.Commands;
 using System;
 using System.Collections.Generic;
 
@@ -45,6 +46,7 @@ internal sealed class SelectedProfileService
 
             _selectedProfileName = value;
             Changed?.Invoke(this, EventArgs.Empty);
+
         }
     }
 

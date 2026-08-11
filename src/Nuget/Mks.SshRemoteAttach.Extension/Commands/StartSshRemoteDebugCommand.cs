@@ -35,7 +35,7 @@ using Microsoft.VisualStudio.Extensibility.Shell;
 using Microsoft.VisualStudio.Extensibility.VSSdkCompatibility;
 using Microsoft.VisualStudio.Shell;
 using Mks.SshRemoteAttach.Extension.Core;
-using Mks.SshRemoteAttach.Extension.Deployment;
+using Mks.SshRemoteAttach.Extension.Services;
 using Command = Microsoft.VisualStudio.Extensibility.Commands.Command;
 using Process = System.Diagnostics.Process;
 
@@ -71,6 +71,9 @@ internal sealed class StartSshRemoteDebugCommand : Command
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
         _deployment = deployment ?? throw new ArgumentNullException(nameof(deployment));
         _selected = selected ?? throw new ArgumentNullException(nameof(selected));
+
+        _selected.Changed += (_, _) => DisplayName = _selected.SelectedProfileName;
+        DisplayName = _selected.SelectedProfileName;
     }
 
     #region Properties

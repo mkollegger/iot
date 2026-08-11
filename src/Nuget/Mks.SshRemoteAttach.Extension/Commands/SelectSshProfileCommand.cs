@@ -116,7 +116,7 @@ internal sealed class SelectSshProfileCommand : Command
             choices,
             defaultIndex,
             -1);
-
+        
         var selectedIndex = await Extensibility.Shell().ShowPromptAsync(
             "Select the SSH profile used for build, deploy, and remote debug.",
             promptOptions,

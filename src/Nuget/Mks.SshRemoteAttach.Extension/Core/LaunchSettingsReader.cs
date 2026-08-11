@@ -24,9 +24,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using Mks.SshRemoteAttach.Extension.Commands;
 
 namespace Mks.SshRemoteAttach.Extension.Core;
 
@@ -36,7 +38,18 @@ namespace Mks.SshRemoteAttach.Extension.Core;
 /// </summary>
 internal sealed class LaunchSettingsReader
 {
+    private readonly StartSshRemoteDebugCommand _startSshRemoteDebugCommand;
+    private readonly SelectedProfileService _selectedProfileService;
     private const string CommandName = "SshRemoteAttach";
+    
+    //public LaunchSettingsReader(SelectedProfileService selectedProfileService, StartSshRemoteDebugCommand startSshRemoteDebugCommand)
+    //{
+    //    Debugger.Break();
+
+
+    //    _selectedProfileService = selectedProfileService ?? throw new ArgumentNullException(nameof(selectedProfileService));
+    //    _startSshRemoteDebugCommand = startSshRemoteDebugCommand ?? throw new ArgumentNullException(nameof(startSshRemoteDebugCommand));
+    //}
 
     /// <summary>
     ///     Parses all <c>SshRemoteAttach</c> profiles from the file at <paramref name="launchSettingsPath" />.

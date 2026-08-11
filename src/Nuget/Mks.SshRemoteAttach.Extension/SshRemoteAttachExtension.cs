@@ -25,7 +25,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Extensibility;
 using Mks.SshRemoteAttach.Extension.Core;
-using Mks.SshRemoteAttach.Extension.Deployment;
+using Mks.SshRemoteAttach.Extension.Services;
 
 namespace Mks.SshRemoteAttach.Extension;
 
