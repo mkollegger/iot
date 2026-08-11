@@ -23,6 +23,7 @@
 // #endregion
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.ServiceHub.Framework;
 using Microsoft.VisualStudio.Extensibility;
 using Mks.SshRemoteAttach.Extension.Core;
 using Mks.SshRemoteAttach.Extension.Services;
@@ -64,5 +65,7 @@ internal sealed class SshRemoteAttachExtension : Microsoft.VisualStudio.Extensib
         services.AddSingleton<SelectedProfileService>();
         services.AddSingleton<LaunchSettingsReader>();
         services.AddSingleton<IDeploymentService, ShareDeploymentService>();
+        
     }
+
 }

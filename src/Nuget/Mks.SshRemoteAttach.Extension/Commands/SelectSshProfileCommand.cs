@@ -22,11 +22,6 @@
 // SOFTWARE.
 // #endregion
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Extensibility;
@@ -34,7 +29,13 @@ using Microsoft.VisualStudio.Extensibility.Commands;
 using Microsoft.VisualStudio.Extensibility.Shell;
 using Microsoft.VisualStudio.Extensibility.VSSdkCompatibility;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Mks.SshRemoteAttach.Extension.Core;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Command = Microsoft.VisualStudio.Extensibility.Commands.Command;
 
 namespace Mks.SshRemoteAttach.Extension.Commands;
@@ -45,6 +46,7 @@ internal sealed class SelectSshProfileCommand : Command
     private readonly AsyncServiceProviderInjection<DTE, DTE2> _dteInjection;
     private readonly LaunchSettingsReader _reader;
     private readonly SelectedProfileService _selected;
+    private CommandConfiguration _commandConfiguration;
 
     public SelectSshProfileCommand(
         VisualStudioExtensibility extensibility,
