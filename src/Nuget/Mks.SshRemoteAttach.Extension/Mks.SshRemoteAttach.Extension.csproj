@@ -49,4 +49,16 @@
     <PackageReference Include="System.Text.Json" Version="9.0.0" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Content Include="Images\ssh-debugger-icon.png">
+			<IncludeInVSIX>true</IncludeInVSIX>
+		</Content>
+		<Content Include="Images\ssh-debugger-preview.png">
+			<IncludeInVSIX>true</IncludeInVSIX>
+		</Content>
+		<Content Include="LICENSE">
+			<IncludeInVSIX>true</IncludeInVSIX>
+		</Content>
+	</ItemGroup>
+
 </Project>

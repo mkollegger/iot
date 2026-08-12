@@ -19,6 +19,7 @@
     <File Path="../.gitignore" />
     <File Path="../build/azure-pipelines.yml" />
     <File Path="../Changelog.md" />
+    <File Path="../LICENSE" />
     <File Path="../README.md" />
     <File Path="mks.iot.projectinfos.proj" />
   </Folder>

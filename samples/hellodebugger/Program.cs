@@ -29,7 +29,7 @@ using System.Diagnostics;
 namespace hellopi
 {
     /// <summary>
-    ///     
+    ///    Remote Debugger Beispielprogramm 
     /// </summary>
     internal static class Program
     {

@@ -1,50 +1,62 @@
-# HelloPi - Raspberry Pi LED Beispiel
+# Hello Debugger
 
-> **Dieses Dokument ist auch in anderen Sprachen verfügbar:** [English](readme.md)
+> **Dieses Dokument ist auch in anderen Sprachen verfügbar:** [English](README.md)
 
 ## Überblick
 
-HelloPi ist ein einfaches Beispielprogramm, das demonstriert, wie man mit .NET 10 Anwendungen für den Raspberry Pi entwickelt, deployed und remote debuggt.
+HelloDebugger ist ein minimales .NET-10-Beispiel für SSH-basiertes Remote-Debugging aus Visual Studio 2026 mit dem SSH Remote Attach-Workflow.
 
 ## Zweck
 
-Dieses Projekt dient als Referenzimplementierung für folgende Szenarien:
+Dieses Projekt dient als Referenz für folgende Szenarien:
 
-- **Entwicklung**: Erstellen von .NET 10 Anwendungen für Raspberry Pi
-- **Deployment**: Bereitstellen der Anwendung auf dem Raspberry Pi
-- **Remote Debugging**: Fernzugriff und Debugging der Anwendung aus Visual Studio Code oder Visual Studio 2026
+- **Remote-Debugging**: .NET-Anwendung per SSH auf einem Zielsystem starten und debuggen
+- **Debugger-Wartemodus**: Mit `--debug` auf das Anhängen des Debuggers warten
+- **Launch-Profile nutzen**: `attach_vs202x.json` und `attach_mac.json` als Vorlage verwenden
 
 ## Funktionalität
 
-Das Programm steuert zwei LEDs am Raspberry Pi und lässt diese blinken. Dies dient als einfaches, aber aussagekräftiges Beispiel für GPIO-Zugriff und Hardware-Steuerung unter .NET.
+- Gibt eine Startmeldung aus
+- Läuft ohne Debugger normal, wenn ohne `--debug` gestartet
+- Wartet mit `--debug` auf das Anhängen des Debuggers
+- Stoppt nach erfolgreichem Attach bei `Debugger.Break()`
 
-## Unterstützte Entwicklungsumgebungen
+## Unterstützte Entwicklungsumgebung
 
-- **Visual Studio Code** mit entsprechenden .NET-Erweiterungen
 - **Visual Studio 2026** mit .NET 10 SDK
 
 ## Voraussetzungen
 
-- Raspberry Pi (empfohlen: Raspberry Pi 4 oder neuer)
 - .NET 10 SDK
-- 1 LEDs mit passenden Vorwiderständen (als 2te Led wird die Onboard-Led verwendet)
-- GPIO-Verkabelung
+- Visual Studio 2026
+- SSH-Zugriff auf das Zielsystem (Linux/macOS/Raspberry Pi)
+- Installierter Remote-Debugger (`vsdbg`) auf dem Zielsystem
 
 ## Erste Schritte
 
-Weitere Informationen zur Installation und Konfiguration finden Sie in der Hauptdokumentation des Projekts:
+Das Beispiel folgt dem gleichen Ablauf wie das SSH-Remote-Debugging-Tutorial:
 
-- [Installation Guide - Raspberry Pi](../../wiki/installguide-raspberrypi.md)
-- [Installation Guide - Linux](../../wiki/installguide-linux.md)
+- Tutorial: <https://github.com/mkollegger/iot/wiki/Tutorials-SshRemoteDebugVs>
+- Setup: <https://github.com/mkollegger/iot/wiki/setup-sshremotedbg>
+
+Empfohlener Ablauf:
+
+1. `samples/hellodebugger` in Visual Studio 2026 öffnen.
+2. Projekt für die Ziel-Runtime bauen.
+3. Build-Ausgabe auf das Zielsystem kopieren.
+4. Eine Launch-Datei auf Host/Benutzer/Pfade anpassen:
+   - `attach_vs202x.json`
+   - `attach_mac.json`
+5. Debug-Adapter mit der gewählten Launch-Datei starten.
+6. Mit `--debug` starten und remote anhängen.
 
 ## Projektstruktur
 
-- `Program.cs` - Hauptprogramm mit LED-Steuerungslogik
-- `hellopi.csproj` - Projektdatei für .NET 10
-- `.vscode/` - Visual Studio Code Konfigurationsdateien
-- `Properties/launchSettings.json` - Launch-Einstellungen für Visual Studio Code
-- `attach_vs202x.json` - Launch-Einstellungen für Visual Studio 2026 (funktioniert auch mit 2022 und 2019)
+- `Program.cs` - Beispielanwendung mit optionalem Debugger-Wartemodus
+- `attach_vs202x.json` - SSH-Launch-Profil (Windows-Host)
+- `attach_mac.json` - SSH-Launch-Profil (macOS-Ziel)
+- `README.md` - Englische Dokumentation
 
 ## Lizenz
 
-Siehe [LICENSE](../../LICENSE) im Hauptverzeichnis des Projekts.
+Siehe [LICENSE](../../LICENSE) im Hauptverzeichnis.

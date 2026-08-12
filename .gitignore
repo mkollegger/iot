@@ -294,3 +294,4 @@ appsettings_biss.json
 remote_*.json
 wiki/
 .DS_Store
+Thumbs.db

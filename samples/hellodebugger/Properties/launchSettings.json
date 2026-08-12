@@ -21,7 +21,6 @@
       "remoteAppDll": "hellopi.dll",
       "remoteAppArgs": "--debug",
       "deployLocalShare": "\\\\192.168.178.69\\share\\debug\\hellopi",
-      "deployFromOutputDir": true,
       "deployBeforeLaunch": true
     },
     "Remote MAC": {
